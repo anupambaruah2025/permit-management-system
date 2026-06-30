@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Permit Mind Map — CHN1A Data Center</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Segoe UI',Tahoma,sans-serif;background:#0f1224;color:#e7e9f3;height:100vh;overflow:hidden}
+  .bar{display:flex;align-items:center;gap:14px;padding:14px 20px;background:#171a33;border-bottom:1px solid #262a47;position:sticky;top:0;z-index:5}
+  .bar h1{font-size:1.05em;font-weight:700}
+  .bar .sub{color:#8b90b5;font-size:.82em}
+  .bar .spacer{flex:1}
+  .btn{background:#262a47;border:1px solid #343a5e;color:#cdd2ef;padding:7px 14px;border-radius:8px;cursor:pointer;font-weight:600;font-size:.82em;transition:.15s}
+  .btn:hover{background:#343a5e}
+  .canvas{position:absolute;inset:64px 0 0 0;overflow:auto;cursor:grab}
+  .canvas:active{cursor:grabbing}
+  .stage{padding:60px 120px;min-width:max-content;display:inline-block}
+
+  /* tree */
+  .node{display:flex;align-items:center}
+  .kids{display:flex;flex-direction:column;gap:14px;margin-left:42px;position:relative}
+  .kids::before{content:"";position:absolute;left:-22px;top:22px;bottom:22px;width:2px;background:#343a5e}
+  .kids>.node{position:relative}
+  .kids>.node::before{content:"";position:absolute;left:-22px;top:50%;width:22px;height:2px;background:#343a5e}
+  .node.collapsed>.kids{display:none}
+
+  .pill{position:relative;display:inline-flex;align-items:center;gap:9px;padding:11px 16px;border-radius:30px;
+        background:#1c2040;border:1.5px solid #343a5e;cursor:pointer;white-space:nowrap;transition:.18s;font-weight:600;font-size:.9em}
+  .pill:hover{transform:translateY(-1px);border-color:#5b6ad0;box-shadow:0 6px 18px rgba(0,0,0,.35)}
+  .pill .tw{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+  .pill .cnt{background:#343a5e;color:#cdd2ef;font-size:.72em;border-radius:10px;padding:1px 8px;font-weight:700}
+  .pill .tog{color:#8b90b5;font-weight:800;width:12px;text-align:center}
+
+  /* root + phase styling */
+  .pill.root{font-size:1.05em;padding:16px 26px;background:linear-gradient(135deg,#5b6ad0,#7c4ddb);border-color:transparent;color:#fff;box-shadow:0 8px 26px rgba(91,106,208,.45)}
+  .pill.phase{font-size:.96em;color:#fff;border-color:transparent}
+  .pill.permit{background:#1c2040}
+  .pill.leaf{cursor:default;font-weight:500;font-size:.82em;color:#c5c9e6;padding:8px 14px;background:#141731;border-style:dashed}
+  .pill.leaf:hover{transform:none;border-color:#343a5e;box-shadow:none}
+  .pill.leaf .k{color:#8b90b5;margin-right:5px}
+  .pill.doc{background:#141731;border-style:solid;font-weight:500;font-size:.82em}
+  .pill.doc::before{content:"📄";font-size:.9em}
+  .pill a.portal{color:#8fb7ff;text-decoration:none}
+
+  .tag{padding:2px 9px;border-radius:11px;font-size:.74em;font-weight:700}
+  .st-Completed{background:#163a25;color:#5fe39a}.st-InProgress{background:#15324a;color:#5cb6f5}.st-Pending{background:#3a3413;color:#f2cf52}
+  .rk-Critical{background:#3a1620;color:#ff7a93}.rk-High{background:#3a2613;color:#ffab5c}.rk-Low{background:#163a25;color:#5fe39a}
+
+  .hint{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);color:#6b6f93;font-size:.78em;background:#171a33;padding:6px 14px;border-radius:20px;border:1px solid #262a47}
+</style>
+</head>
+<body>
+<div class="bar">
+  <h1>🧠 Permit Mind Map</h1>
+  <span class="sub">CHN1A Data Center · click a node to branch out</span>
+  <span class="spacer"></span>
+  <button class="btn" onclick="expandAll(true)">Expand all</button>
+  <button class="btn" onclick="expandAll(false)">Collapse</button>
+  <button class="btn" onclick="location.href='index.html'">📊 BI view</button>
+</div>
+<div class="canvas" id="canvas"><div class="stage" id="stage"></div></div>
+<div class="hint">drag to pan · click any node to expand / collapse</div>
+
+<script>
+const PHC={1:"#FF6B6B",2:"#2BA9A2",3:"#FF9500",4:"#46b39d",5:"#7ECFB8"};
+const PHN={1:"Development",2:"Design & Planning",3:"Construction",4:"Commissioning",5:"Operations"};
+const P=[
+{id:1,n:"Company Registration",a:"DBD",ph:1,t:"30 days",c:"5K THB",s:"Completed",r:"Low",f:"https://www.dbd.go.th/th/register-business",d:["Registration form","Articles of Association","Shareholder IDs","Capital proof (1M THB)","Board resolution"]},
+{id:2,n:"BOI Promotion Certificate",a:"BOI",ph:1,t:"120 days",c:"No fee",s:"Completed",r:"Critical",f:"https://boi-investment.boi.go.th/public/",d:["Form F PA PP 04","ERC Power Confirmation (MANDATORY)","3-yr financials","PUE modeling","Thailand Benefit Plan"]},
+{id:3,n:"Foreign Business License",a:"DBD",ph:1,t:"60 days",c:"10K THB",s:"Completed",r:"Low",f:"https://www.dbd.go.th/th/foreign-business-license",d:["FBL form (P.13)","Company registration","THB 2M capital proof","Business plan (Thai)","Investor docs"]},
+{id:4,n:"Land Use & Zoning",a:"DPW",ph:1,t:"30 days",c:"2K THB",s:"Completed",r:"Low",f:"https://www.dlt.go.th/",d:["Land title (Chanote)","Zoning request form","Site plan","Land-use docs","Town planning map"]},
+{id:5,n:"Environmental Impact Assessment",a:"ONEP",ph:1,t:"180 days",c:"~350K THB",s:"Completed",r:"Critical",f:"https://www.onep.go.th/",d:["Screening & TOR","Full EIA report","Baseline data","Mitigation plans","Community consultation"]},
+{id:6,n:"Building Construction Permit",a:"DPW",ph:2,t:"60 days",c:"15K THB",s:"Completed",r:"Critical",f:"https://www.dlt.go.th/",d:["Permit application","Architectural plans","Structural designs","MEP specs","Fire safety plans"]},
+{id:7,n:"Road Access / Highway",a:"DPW",ph:2,t:"45 days",c:"8K THB",s:"In Progress",r:"High",f:"https://www.dlt.go.th/",d:["Access application","Site plan","Traffic study","Road design","Engineering cert"]},
+{id:8,n:"Grid Connection Approval",a:"PEA/MEA",ph:2,t:"60 days",c:"~75K THB",s:"Completed",r:"High",f:"https://www.pea.co.th/",d:["Connection application","Single-line diagram","Load calculations","Substation design","Distribution design"]},
+{id:9,n:"Power Availability (ERC)",a:"ERC",ph:2,t:"30 days",c:"No fee",s:"Completed",r:"Critical",f:"https://www.erc.or.th/",d:["Power requirement letter","Load forecast","Project specs","Site map","Grid plans"]},
+{id:10,n:"HV Substation Approval",a:"PEA/MEA",ph:2,t:"90 days",c:"~150K THB",s:"Completed",r:"High",f:"https://www.pea.co.th/",d:["Substation design","Electrical specs","Safety plan","Environmental assessment","Land control"]},
+{id:11,n:"Water Supply Connection",a:"MWA/PWA",ph:3,t:"45 days",c:"~30K THB",s:"Completed",r:"Low",f:"https://www.mwa.co.th/",d:["Connection application","Demand calculation","Supply drawings","Tank design","Routing plan"]},
+{id:12,n:"Wastewater / Drainage",a:"MWA",ph:3,t:"45 days",c:"~37K THB",s:"Completed",r:"Low",f:"https://www.mwa.co.th/",d:["Discharge application","Treatment design","Quality standards","Drainage design","Monitoring plan"]},
+{id:13,n:"Fire Protection System",a:"DPW",ph:3,t:"30 days",c:"~115K THB",s:"Completed",r:"High",f:"https://www.dlt.go.th/",d:["Fire safety plan","Detection design","Suppression design","Emergency lighting","Evacuation plan"]},
+{id:14,n:"Generator & Fuel Storage",a:"DOEB",ph:3,t:"60 days",c:"~15K THB",s:"In Progress",r:"High",f:"https://www.doeb.go.th/",d:["Generator specs","Fuel tank design","Secondary containment (110%)","Safety plan","Test schedule"]},
+{id:15,n:"Telecom / Fiber",a:"NBTC",ph:3,t:"45 days",c:"~10K THB",s:"In Progress",r:"Low",f:"https://www.nbtc.go.th/",d:["Service application","Network architecture","Coverage map","Tech specs","Security plan"]},
+{id:16,n:"Electrical Inspection",a:"PEA/MEA",ph:3,t:"14 days",c:"5K THB",s:"In Progress",r:"Low",f:"https://www.pea.co.th/",d:["As-built design","Equipment certs","Load verification","Grounding compliance","Single-line diagram"]},
+{id:17,n:"Fire Safety Inspection",a:"Fire Authority",ph:4,t:"7 days",c:"No fee",s:"In Progress",r:"Low",f:"https://www.dlt.go.th/",d:["Test certificates","Lighting verification","Extinguisher cert","Route verification","Training records"]},
+{id:18,n:"Building Completion",a:"DPW",ph:4,t:"7 days",c:"3K THB",s:"In Progress",r:"Low",f:"https://www.dlt.go.th/",d:["As-built drawings","Structural cert","Material tests","MEP reports","QA docs"]},
+{id:19,n:"Occupancy Certificate",a:"DPW",ph:4,t:"14 days",c:"2K THB",s:"In Progress",r:"High",f:"https://www.dlt.go.th/",d:["Completion approval","Fire approval","Electrical approval","Utility connections","Insurance cert"]},
+{id:20,n:"Commissioning & Utility Acceptance",a:"Utilities",ph:4,t:"21 days",c:"~22K THB",s:"Pending",r:"Low",f:"https://www.pea.co.th/",d:["Electrical commissioning","Water testing","Wastewater verification","Fire test","Performance certs"]},
+{id:21,n:"Factory License",a:"DIW",ph:5,t:"30 days",c:"5K THB",s:"Pending",r:"Low",f:"https://www.diw.go.th/",d:["License application","Building cert","Environmental assessment","Worker safety plan","Waste plan"]},
+{id:22,n:"PDPA Compliance",a:"PDPC",ph:5,t:"30 days",c:"No fee",s:"Pending",r:"Low",f:"https://www.pdpa.go.th/",d:["Protection policy","Privacy notices","Processing agreements","Breach response","Training records"]},
+{id:23,n:"Cybersecurity Compliance",a:"NCSA",ph:5,t:"30 days",c:"No fee",s:"Pending",r:"Low",f:"https://www.ncsa.go.th/",d:["Security assessment","Incident response","Access control","Disaster recovery","ISO 27001 / SOC 2"]},
+];
+
+const el=(cls,html)=>{const d=document.createElement('div');d.className=cls;if(html!=null)d.innerHTML=html;return d;};
+
+// node = {pillHTML, pillClass, color, children:[], collapsed}
+function makeNode(node){
+  const wrap=el('node'+(node.collapsed?' collapsed':''));
+  const pill=el('pill '+(node.pillClass||''));
+  if(node.color) pill.style.borderColor=node.color, pill.style.background=node.bg||node.color;
+  let inner='';
+  if(node.tw) inner+=`<span class="tw" style="background:${node.tw}"></span>`;
+  inner+=node.label;
+  if(node.children&&node.children.length) inner+=` <span class="cnt">${node.count!=null?node.count:node.children.length}</span><span class="tog"></span>`;
+  pill.innerHTML=inner;
+  wrap.appendChild(pill);
+  let kidsBox=null;
+  if(node.children&&node.children.length){
+    kidsBox=el('kids');
+    node.children.forEach(c=>kidsBox.appendChild(makeNode(c)));
+    wrap.appendChild(kidsBox);
+    const tog=()=>{wrap.classList.toggle('collapsed');tog._set();};
+    tog._set=()=>{const t=pill.querySelector('.tog');if(t)t.textContent=wrap.classList.contains('collapsed')?'▸':'▾';};
+    tog._set();
+    pill.addEventListener('click',e=>{e.stopPropagation();tog();});
+  }
+  return wrap;
+}
+
+function permitNode(p){
+  const tw=PHC[p.ph];
+  return {
+    label:`<b>${p.id}.</b> ${p.n}`, pillClass:'permit', tw, collapsed:true,
+    children:[
+      {label:`<span class="k">Authority</span> ${p.a}`, pillClass:'leaf'},
+      {label:`<span class="k">Phase</span> ${PHN[p.ph]}`, pillClass:'leaf'},
+      {label:`<span class="k">Lead time</span> ${p.t}`, pillClass:'leaf'},
+      {label:`<span class="k">Cost</span> ${p.c}`, pillClass:'leaf'},
+      {label:`<span class="k">Status</span> <span class="tag st-${p.s.replace(' ','')}">${p.s}</span>`, pillClass:'leaf'},
+      {label:`<span class="k">Risk</span> <span class="tag rk-${p.r}">${p.r}</span>`, pillClass:'leaf'},
+      {label:`Documents`, pillClass:'permit', tw, collapsed:true, count:p.d.length,
+        children:p.d.map(x=>({label:x, pillClass:'doc'}))
+          .concat([{label:`<a class="portal" href="${p.f}" target="_blank">🌐 Official portal ↗</a>`, pillClass:'leaf'}])},
+    ]
+  };
+}
+
+const tree={
+  label:'CHN1A<br>Data Center', pillClass:'root',
+  children:[1,2,3,4,5].map(ph=>({
+    label:PHN[ph], pillClass:'phase', color:PHC[ph], bg:PHC[ph], collapsed:false,
+    count:P.filter(p=>p.ph===ph).length,
+    children:P.filter(p=>p.ph===ph).map(permitNode)
+  }))
+};
+
+document.getElementById('stage').appendChild(makeNode(tree));
+
+// center the view on the root node on load
+requestAnimationFrame(()=>{
+  const rootPill=document.querySelector('.stage > .node > .pill');
+  if(rootPill){const cv=document.getElementById('canvas');const r=rootPill;
+    cv.scrollTop=r.offsetTop-cv.clientHeight/2+r.offsetHeight/2;
+    cv.scrollLeft=Math.max(0,r.offsetLeft-40);}
+});
+
+function expandAll(open){
+  document.querySelectorAll('.node').forEach(n=>{
+    if(!n.querySelector(':scope > .kids')) return;
+    n.classList.toggle('collapsed', !open);
+    const t=n.querySelector(':scope > .pill .tog'); if(t)t.textContent=open?'▾':'▸';
+  });
+  // keep root always open
+  const root=document.querySelector('.stage > .node'); root.classList.remove('collapsed');
+}
+
+// drag to pan
+const cv=document.getElementById('canvas');let down=false,sx,sy,sl,st;
+cv.addEventListener('mousedown',e=>{down=true;sx=e.pageX;sy=e.pageY;sl=cv.scrollLeft;st=cv.scrollTop;});
+window.addEventListener('mouseup',()=>down=false);
+window.addEventListener('mousemove',e=>{if(!down)return;cv.scrollLeft=sl-(e.pageX-sx);cv.scrollTop=st-(e.pageY-sy);});
+</script>
+</body>
+</html>
