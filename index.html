@@ -1,1542 +1,250 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thailand Data Center - Complete Permit Management Dashboard</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            color: #333;
-        }
-
-        .container {
-            max-width: 1800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .header {
-            background: white;
-            padding: 25px;
-            border-radius: 15px;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-        }
-
-        .header h1 {
-            color: #667eea;
-            margin-bottom: 10px;
-            font-size: 2em;
-        }
-
-        .header p {
-            color: #666;
-            font-size: 0.95em;
-        }
-
-        .tabs {
-            display: flex;
-            gap: 10px;
-            background: white;
-            padding: 15px;
-            border-radius: 15px;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-            flex-wrap: wrap;
-        }
-
-        .tab-btn {
-            padding: 12px 25px;
-            border: none;
-            background: #f0f0f0;
-            color: #333;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            font-size: 0.95em;
-        }
-
-        .tab-btn:hover {
-            background: #e0e0e0;
-        }
-
-        .tab-btn.active {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .tab-content {
-            display: none;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* ===== DASHBOARD TAB ===== */
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .kpi-card {
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            text-align: center;
-            border-top: 4px solid;
-            transition: all 0.3s ease;
-        }
-
-        .kpi-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-        }
-
-        .kpi-card.blue { border-top-color: #667eea; }
-        .kpi-card.red { border-top-color: #FF6B6B; }
-        .kpi-card.green { border-top-color: #51CF66; }
-        .kpi-card.orange { border-top-color: #FFB347; }
-        .kpi-card.purple { border-top-color: #B197FC; }
-
-        .kpi-value {
-            font-size: 2.5em;
-            font-weight: 700;
-            color: #667eea;
-            margin: 10px 0;
-        }
-
-        .kpi-label {
-            font-size: 0.9em;
-            color: #999;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .kpi-subtitle {
-            font-size: 0.8em;
-            color: #ccc;
-            margin-top: 5px;
-        }
-
-        .progress-section {
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
-        }
-
-        .progress-section h3 {
-            color: #667eea;
-            margin-bottom: 20px;
-            font-size: 1.2em;
-        }
-
-        .progress-item {
-            margin-bottom: 20px;
-        }
-
-        .progress-label {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #333;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 10px;
-            background: #eee;
-            border-radius: 5px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #667eea, #764ba2);
-            transition: width 0.5s ease;
-        }
-
-        .status-chips {
-            display: flex;
-            gap: 15px;
-            margin-top: 20px;
-            flex-wrap: wrap;
-        }
-
-        .status-chip {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-size: 0.85em;
-            font-weight: 600;
-        }
-
-        .status-chip.pending { background: #FFE8CC; color: #FF9500; }
-        .status-chip.inprogress { background: #E8F4F8; color: #0096D6; }
-        .status-chip.completed { background: #E8F7E3; color: #51CF66; }
-        .status-chip.blocked { background: #FFE8E8; color: #FF6B6B; }
-
-        /* ===== TIMELINE TAB ===== */
-        .timeline-container {
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            overflow-x: auto;
-        }
-
-        .gantt-chart {
-            display: flex;
-            min-width: 100%;
-        }
-
-        .gantt-labels {
-            flex: 0 0 200px;
-            border-right: 2px solid #ddd;
-            padding-right: 15px;
-        }
-
-        .gantt-bars {
-            flex: 1;
-            padding-left: 20px;
-            position: relative;
-        }
-
-        .gantt-months {
-            display: flex;
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 40px;
-            border-bottom: 2px solid #ddd;
-            background: #f9f9f9;
-        }
-
-        .gantt-month {
-            flex: 1;
-            border-right: 1px solid #eee;
-            font-weight: 600;
-            font-size: 0.8em;
-            color: #666;
-            padding: 10px 5px;
-            text-align: center;
-        }
-
-        .permit-timeline-row {
-            display: flex;
-            align-items: center;
-            margin-top: 50px;
-            min-height: 35px;
-            border-bottom: 1px solid #eee;
-            padding: 10px 0;
-        }
-
-        .permit-label {
-            flex: 0 0 200px;
-            padding-right: 15px;
-            font-size: 0.85em;
-            font-weight: 600;
-            color: #333;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .gantt-bar {
-            position: relative;
-            height: 25px;
-            border-radius: 4px;
-            background: linear-gradient(90deg, #667eea, #764ba2);
-            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .gantt-bar:hover {
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.5);
-            transform: scaleY(1.2);
-        }
-
-        .gantt-bar.critical {
-            background: linear-gradient(90deg, #FF6B6B, #FF5252);
-            box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
-        }
-
-        .gantt-bar.completed {
-            background: linear-gradient(90deg, #51CF66, #40A940);
-            opacity: 0.6;
-        }
-
-        .gantt-tooltip {
-            position: absolute;
-            background: rgba(0,0,0,0.9);
-            color: white;
-            padding: 8px 12px;
-            border-radius: 4px;
-            font-size: 0.8em;
-            white-space: nowrap;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.2s;
-            z-index: 1000;
-        }
-
-        .gantt-bar:hover .gantt-tooltip {
-            opacity: 1;
-        }
-
-        /* ===== DEPENDENCIES TAB ===== */
-        .dependency-section {
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            margin-bottom: 25px;
-        }
-
-        .dependency-section h3 {
-            color: #667eea;
-            margin-bottom: 20px;
-            font-size: 1.1em;
-            border-bottom: 2px solid #eee;
-            padding-bottom: 10px;
-        }
-
-        .blocking-permits {
-            display: grid;
-            gap: 15px;
-        }
-
-        .blocking-card {
-            background: linear-gradient(135deg, #FFE8E8 0%, #FFB3B3 100%);
-            padding: 20px;
-            border-radius: 10px;
-            border-left: 4px solid #FF6B6B;
-        }
-
-        .blocking-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 12px;
-            font-weight: 700;
-            color: #FF5252;
-        }
-
-        .blocking-permit-num {
-            background: #FF6B6B;
-            color: white;
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-        }
-
-        .blocking-list {
-            list-style: none;
-            padding-left: 47px;
-        }
-
-        .blocking-list li {
-            padding: 8px 0;
-            color: #555;
-            font-size: 0.9em;
-            border-bottom: 1px solid rgba(255,107,107,0.2);
-        }
-
-        .blocking-list li:last-child {
-            border-bottom: none;
-        }
-
-        .blocking-list li:before {
-            content: '→ ';
-            color: #FF6B6B;
-            font-weight: bold;
-            margin-right: 8px;
-        }
-
-        .dependency-flow {
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            margin-bottom: 25px;
-            border: 2px dashed #667eea;
-        }
-
-        .flow-item {
-            display: flex;
-            align-items: center;
-            margin: 15px 0;
-            font-weight: 600;
-        }
-
-        .flow-box {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            padding: 12px 20px;
-            border-radius: 8px;
-            min-width: 150px;
-            text-align: center;
-            font-size: 0.9em;
-        }
-
-        .flow-arrow {
-            flex: 1;
-            height: 2px;
-            background: #667eea;
-            margin: 0 10px;
-            position: relative;
-        }
-
-        .flow-arrow::after {
-            content: '→';
-            position: absolute;
-            right: -15px;
-            top: -10px;
-            font-size: 1.5em;
-            color: #667eea;
-        }
-
-        /* ===== PHASE VIEW TAB ===== */
-        .phase-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-        }
-
-        .phase-card {
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
-        }
-
-        .phase-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-        }
-
-        .phase-header-card {
-            padding: 20px;
-            color: white;
-            font-weight: 700;
-            font-size: 1.1em;
-        }
-
-        .phase-header-card.p1 { background: linear-gradient(135deg, #FF6B6B, #FF5252); }
-        .phase-header-card.p2 { background: linear-gradient(135deg, #4ECDC4, #2BA9A2); }
-        .phase-header-card.p3 { background: linear-gradient(135deg, #FFB347, #FF9500); }
-        .phase-header-card.p4 { background: linear-gradient(135deg, #95E1D3, #6BD4B8); }
-        .phase-header-card.p5 { background: linear-gradient(135deg, #A8E6CF, #7ECFB8); }
-
-        .phase-content {
-            padding: 20px;
-        }
-
-        .permit-item {
-            padding: 12px;
-            background: #f8f9ff;
-            border-radius: 6px;
-            margin-bottom: 10px;
-            font-size: 0.9em;
-            cursor: pointer;
-            transition: all 0.2s;
-            border-left: 3px solid #667eea;
-        }
-
-        .permit-item:hover {
-            background: #e8ecff;
-            transform: translateX(5px);
-        }
-
-        .permit-item.critical {
-            border-left-color: #FF6B6B;
-            background: #ffe8e8;
-        }
-
-        .permit-num {
-            font-weight: 700;
-            color: #667eea;
-        }
-
-        /* ===== AUTHORITIES TAB ===== */
-        .authorities-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-        }
-
-        .authority-card {
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            border-top: 4px solid #667eea;
-        }
-
-        .authority-name {
-            font-weight: 700;
-            font-size: 1.05em;
-            color: #333;
-            margin-bottom: 15px;
-        }
-
-        .authority-permits {
-            list-style: none;
-            margin-bottom: 15px;
-        }
-
-        .authority-permits li {
-            padding: 8px 0;
-            font-size: 0.9em;
-            color: #555;
-            border-bottom: 1px solid #eee;
-        }
-
-        .authority-permits li:last-child {
-            border-bottom: none;
-        }
-
-        .authority-permits li:before {
-            content: '✓ ';
-            color: #667eea;
-            font-weight: bold;
-            margin-right: 5px;
-        }
-
-        .authority-contact {
-            background: #f8f9ff;
-            padding: 12px;
-            border-radius: 6px;
-            font-size: 0.85em;
-            color: #555;
-        }
-
-        .contact-item {
-            margin: 8px 0;
-            display: flex;
-            gap: 10px;
-        }
-
-        .contact-label {
-            font-weight: 600;
-            color: #667eea;
-            min-width: 80px;
-        }
-
-        .contact-value {
-            color: #333;
-            word-break: break-all;
-        }
-
-        /* ===== MODALS ===== */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.7);
-            animation: fadeIn 0.3s ease;
-        }
-
-        .modal.active {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-content {
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            width: 90%;
-            max-width: 700px;
-            max-height: 85vh;
-            overflow-y: auto;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            animation: slideUp 0.4s ease;
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .close-btn {
-            float: right;
-            font-size: 2em;
-            font-weight: bold;
-            color: #999;
-            cursor: pointer;
-            transition: color 0.3s;
-            line-height: 1;
-        }
-
-        .close-btn:hover {
-            color: #333;
-        }
-
-        .modal-header {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 25px;
-            border-bottom: 3px solid #667eea;
-            padding-bottom: 15px;
-        }
-
-        .permit-number {
-            background: #667eea;
-            color: white;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 1.2em;
-        }
-
-        .modal-header h2 {
-            color: #333;
-            font-size: 1.8em;
-            flex: 1;
-        }
-
-        .modal-section {
-            margin-bottom: 25px;
-        }
-
-        .modal-section h3 {
-            color: #667eea;
-            font-size: 1.1em;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .modal-section h3::before {
-            content: '';
-            width: 4px;
-            height: 20px;
-            background: #667eea;
-            border-radius: 2px;
-        }
-
-        .authority-info {
-            background: #f8f9ff;
-            padding: 15px;
-            border-radius: 8px;
-            border-left: 4px solid #667eea;
-        }
-
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px solid #ddd;
-            font-size: 0.95em;
-        }
-
-        .info-row:last-child {
-            border-bottom: none;
-        }
-
-        .info-label {
-            font-weight: 600;
-            color: #667eea;
-        }
-
-        .info-value {
-            color: #333;
-        }
-
-        .documents-list {
-            list-style: none;
-        }
-
-        .documents-list li {
-            padding: 10px;
-            background: #f8f9ff;
-            margin-bottom: 8px;
-            border-radius: 6px;
-            border-left: 3px solid #667eea;
-            font-size: 0.95em;
-            color: #333;
-        }
-
-        .documents-list li:before {
-            content: '✓ ';
-            color: #667eea;
-            font-weight: bold;
-            margin-right: 5px;
-        }
-
-        .form-link {
-            display: inline-block;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            padding: 12px 25px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            margin-top: 15px;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            border: none;
-        }
-
-        .form-link:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
-        }
-
-        .risk-indicator {
-            display: inline-block;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 0.85em;
-            font-weight: 600;
-            margin-top: 10px;
-        }
-
-        .risk-high {
-            background: #FFE8E8;
-            color: #FF6B6B;
-        }
-
-        .risk-medium {
-            background: #FFE8CC;
-            color: #FF9500;
-        }
-
-        .risk-low {
-            background: #E8F7E3;
-            color: #51CF66;
-        }
-
-        .footer {
-            text-align: center;
-            color: white;
-            padding: 30px;
-            opacity: 0.8;
-            margin-top: 40px;
-        }
-
-        @media (max-width: 768px) {
-            .dashboard-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .tabs {
-                overflow-x: auto;
-                padding: 10px;
-            }
-
-            .gantt-chart {
-                min-width: 120%;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Permit BI Dashboard — CHN1A Data Center</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Segoe UI',Tahoma,sans-serif;background:#eaedf5;color:#2b2b3a;padding:16px}
+  .head{display:flex;justify-content:space-between;align-items:center;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;padding:18px 24px;border-radius:14px;box-shadow:0 6px 22px rgba(102,126,234,.3);margin-bottom:14px;flex-wrap:wrap;gap:10px}
+  .head h1{font-size:1.3em}
+  .head p{opacity:.9;font-size:.85em}
+  .reset{background:rgba(255,255,255,.22);border:none;color:#fff;padding:9px 18px;border-radius:8px;cursor:pointer;font-weight:600;transition:.2s}
+  .reset:hover{background:rgba(255,255,255,.38)}
+
+  /* Slicers */
+  .slicers{background:#fff;border-radius:12px;padding:14px 18px;box-shadow:0 4px 16px rgba(0,0,0,.07);margin-bottom:14px;display:flex;gap:24px;flex-wrap:wrap;align-items:center}
+  .slicer-group{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .slicer-group .lbl{font-size:.72em;font-weight:700;color:#8a8fa3;text-transform:uppercase;letter-spacing:.5px;margin-right:2px}
+  .chip{padding:6px 13px;border:1.5px solid #e1e4ef;border-radius:16px;cursor:pointer;font-size:.82em;font-weight:600;background:#fff;color:#555;transition:.18s;user-select:none}
+  .chip:hover{border-color:#667eea}
+  .chip.on{color:#fff;border-color:transparent}
+  .chip.on.ph1{background:#FF6B6B}.chip.on.ph2{background:#2BA9A2}.chip.on.ph3{background:#FF9500}.chip.on.ph4{background:#6BD4B8}.chip.on.ph5{background:#7ECFB8}
+  .chip.on.st-c{background:#51CF66}.chip.on.st-i{background:#4DABF7}.chip.on.st-p{background:#FFB000}
+  .chip.on.rk-crit{background:#e03131}.chip.on.rk-high{background:#e8590c}.chip.on.rk-medium{background:#1c7ed6}.chip.on.rk-low{background:#2f9e44}
+
+  /* KPI */
+  .kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:14px}
+  .kpi{background:#fff;border-radius:12px;padding:16px;box-shadow:0 4px 16px rgba(0,0,0,.07);border-top:4px solid #667eea;text-align:center}
+  .kpi .v{font-size:1.9em;font-weight:800;color:#5b6ad0;line-height:1}
+  .kpi .l{font-size:.68em;color:#9197ab;text-transform:uppercase;letter-spacing:.5px;margin-top:7px;font-weight:700}
+  .kpi.c1{border-top-color:#667eea}.kpi.c2{border-top-color:#51CF66}.kpi.c3{border-top-color:#4DABF7}.kpi.c4{border-top-color:#FFB000}.kpi.c5{border-top-color:#FF6B6B}.kpi.c6{border-top-color:#B197FC}
+
+  /* Charts */
+  .charts{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:14px}
+  .panel{background:#fff;border-radius:12px;padding:16px;box-shadow:0 4px 16px rgba(0,0,0,.07);position:relative}
+  .panel h3{font-size:.82em;color:#667eea;font-weight:700;margin-bottom:12px;text-transform:uppercase;letter-spacing:.5px}
+  .panel .hint{position:absolute;top:14px;right:14px;font-size:.62em;color:#bbb}
+  .span2{grid-column:span 2}.span4{grid-column:span 4}
+  .cwrap{position:relative;height:200px}
+  .cwrap.tall{height:360px}
+
+  /* Table */
+  .tablewrap{background:#fff;border-radius:12px;padding:16px;box-shadow:0 4px 16px rgba(0,0,0,.07);overflow-x:auto}
+  .tablewrap h3{font-size:.82em;color:#667eea;font-weight:700;margin-bottom:12px;text-transform:uppercase;letter-spacing:.5px}
+  table{width:100%;border-collapse:collapse;font-size:.85em}
+  th{text-align:left;padding:10px 12px;color:#8a8fa3;border-bottom:2px solid #eef0f7;font-weight:700;cursor:pointer;white-space:nowrap}
+  th:hover{color:#667eea}
+  td{padding:10px 12px;border-bottom:1px solid #f0f1f7}
+  tr.row{cursor:pointer;transition:.15s}
+  tr.row:hover{background:#f5f7ff}
+  .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:middle}
+  .tag{padding:3px 9px;border-radius:11px;font-size:.78em;font-weight:700;white-space:nowrap}
+  .tag.st-c{background:#d3f9d8;color:#2b8a3e}.tag.st-i{background:#d0ebff;color:#1971c2}.tag.st-p{background:#fff3bf;color:#e67700}
+  .tag.rk-crit{background:#ffe3e3;color:#c92a2a}.tag.rk-high{background:#ffe8cc;color:#d9480f}.tag.rk-medium{background:#d0ebff;color:#1971c2}.tag.rk-low{background:#d3f9d8;color:#2b8a3e}
+
+  /* Modal */
+  .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:999;align-items:center;justify-content:center}
+  .modal.on{display:flex}
+  .mc{background:#fff;border-radius:16px;width:92%;max-width:640px;max-height:88vh;overflow-y:auto;animation:pop .3s ease}
+  @keyframes pop{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+  .mh{padding:22px 26px;color:#fff;display:flex;align-items:center;gap:14px}
+  .mh .n{background:rgba(255,255,255,.25);min-width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.2em}
+  .mh h2{font-size:1.25em}
+  .mb{padding:22px 26px}
+  .mrow{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid #f0f1f7;font-size:.9em}
+  .mrow .k{font-weight:700;color:#667eea}
+  .docs{list-style:none;margin-top:6px}
+  .docs li{padding:8px 12px;background:#f6f7fc;border-radius:7px;margin-top:6px;font-size:.88em}
+  .docs li::before{content:'✓ ';color:#51CF66;font-weight:bold}
+  .mlink{display:inline-block;margin-top:16px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;padding:11px 22px;border-radius:9px;text-decoration:none;font-weight:600}
+  .x{margin-left:auto;background:none;border:none;color:#fff;font-size:1.7em;cursor:pointer;line-height:1}
+  @media(max-width:1100px){.kpis{grid-template-columns:repeat(3,1fr)}.charts{grid-template-columns:repeat(2,1fr)}.span2,.span4{grid-column:span 2}}
+  @media(max-width:640px){.kpis{grid-template-columns:repeat(2,1fr)}.charts{grid-template-columns:1fr}.span2,.span4{grid-column:span 1}}
+</style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>Thailand Data Center Permitting Dashboard</h1>
-            <p>Complete permit management system with timeline, dependencies, and tracking</p>
-        </div>
+<div class="head">
+  <div><h1>📊 Permit BI Dashboard</h1><p>CHN1A GFL Data Center — click any chart, slice, or bar to cross-filter the whole dashboard</p></div>
+  <button class="reset" onclick="resetFilters()">↺ Reset filters</button>
+</div>
 
-        <div class="tabs">
-            <button class="tab-btn active" data-tab="dashboard">Dashboard</button>
-            <button class="tab-btn" data-tab="timeline">Timeline/Gantt</button>
-            <button class="tab-btn" data-tab="dependencies">Dependencies</button>
-            <button class="tab-btn" data-tab="phases">Phases</button>
-            <button class="tab-btn" data-tab="authorities">Authorities</button>
-        </div>
+<div class="slicers">
+  <div class="slicer-group"><span class="lbl">Phase</span><span id="phaseChips"></span></div>
+  <div class="slicer-group"><span class="lbl">Status</span><span id="statusChips"></span></div>
+  <div class="slicer-group"><span class="lbl">Risk</span><span id="riskChips"></span></div>
+</div>
 
-        <!-- ===== DASHBOARD TAB ===== -->
-        <div id="dashboard" class="tab-content active">
-            <div class="dashboard-grid">
-                <div class="kpi-card blue">
-                    <div class="kpi-label">Total Permits</div>
-                    <div class="kpi-value">23</div>
-                    <div class="kpi-subtitle">All phases</div>
-                </div>
-                <div class="kpi-card red">
-                    <div class="kpi-label">Critical Path</div>
-                    <div class="kpi-value">180</div>
-                    <div class="kpi-subtitle">days (EIA)</div>
-                </div>
-                <div class="kpi-card green">
-                    <div class="kpi-label">Authorities</div>
-                    <div class="kpi-value">13+</div>
-                    <div class="kpi-subtitle">agencies</div>
-                </div>
-                <div class="kpi-card orange">
-                    <div class="kpi-label">Estimated Cost</div>
-                    <div class="kpi-value">1.5M</div>
-                    <div class="kpi-subtitle">THB</div>
-                </div>
-                <div class="kpi-card purple">
-                    <div class="kpi-label">Project Timeline</div>
-                    <div class="kpi-value">18+</div>
-                    <div class="kpi-subtitle">months</div>
-                </div>
-            </div>
+<div class="kpis">
+  <div class="kpi c1"><div class="v" id="k-total">23</div><div class="l">Permits</div></div>
+  <div class="kpi c2"><div class="v" id="k-done">12</div><div class="l">Completed</div></div>
+  <div class="kpi c3"><div class="v" id="k-prog">7</div><div class="l">In Progress</div></div>
+  <div class="kpi c4"><div class="v" id="k-pend">4</div><div class="l">Pending</div></div>
+  <div class="kpi c5"><div class="v" id="k-days">0</div><div class="l">Total Lead Days</div></div>
+  <div class="kpi c6"><div class="v" id="k-cost">0</div><div class="l">Budget (THB)</div></div>
+</div>
 
-            <div class="progress-section">
-                <h3>Permit Status Overview</h3>
-                <div class="progress-item">
-                    <div class="progress-label">
-                        <span>Overall Project Progress</span>
-                        <span>12 / 23</span>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: 52%;"></div>
-                    </div>
-                </div>
-                <div class="status-chips">
-                    <div class="status-chip pending">
-                        <span>●</span> Pending (4)
-                    </div>
-                    <div class="status-chip inprogress">
-                        <span>●</span> In Progress (7)
-                    </div>
-                    <div class="status-chip completed">
-                        <span>●</span> Completed (12)
-                    </div>
-                    <div class="status-chip blocked">
-                        <span>●</span> Blocked (0)
-                    </div>
-                </div>
-            </div>
+<div class="charts">
+  <div class="panel"><h3>Status Mix</h3><span class="hint">click ▸ filter</span><div class="cwrap"><canvas id="statusChart"></canvas></div></div>
+  <div class="panel"><h3>Permits by Phase</h3><span class="hint">click ▸ filter</span><div class="cwrap"><canvas id="phaseChart"></canvas></div></div>
+  <div class="panel"><h3>Budget by Phase (THB)</h3><div class="cwrap"><canvas id="budgetChart"></canvas></div></div>
+  <div class="panel"><h3>Risk Breakdown</h3><span class="hint">click ▸ filter</span><div class="cwrap"><canvas id="riskChart"></canvas></div></div>
+  <div class="panel span4"><h3>Project Timeline — Gantt (months)</h3><div class="cwrap tall"><canvas id="ganttChart"></canvas></div></div>
+</div>
 
-            <div class="progress-section">
-                <h3>Phase Progress</h3>
-                <div class="progress-item">
-                    <div class="progress-label">
-                        <span>Development (5 permits)</span>
-                        <span>5 / 5</span>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: 100%; background: linear-gradient(90deg, #FF6B6B, #FF5252);"></div>
-                    </div>
-                </div>
-                <div class="progress-item">
-                    <div class="progress-label">
-                        <span>Design & Planning (5 permits)</span>
-                        <span>4 / 5</span>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: 80%; background: linear-gradient(90deg, #4ECDC4, #2BA9A2);"></div>
-                    </div>
-                </div>
-                <div class="progress-item">
-                    <div class="progress-label">
-                        <span>Construction (6 permits)</span>
-                        <span>3 / 6</span>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: 50%; background: linear-gradient(90deg, #FFB347, #FF9500);"></div>
-                    </div>
-                </div>
-                <div class="progress-item">
-                    <div class="progress-label">
-                        <span>Commissioning (4 permits)</span>
-                        <span>0 / 4</span>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: 0%; background: linear-gradient(90deg, #95E1D3, #6BD4B8);"></div>
-                    </div>
-                </div>
-                <div class="progress-item">
-                    <div class="progress-label">
-                        <span>Operations (3 permits)</span>
-                        <span>0 / 3</span>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: 0%; background: linear-gradient(90deg, #A8E6CF, #7ECFB8);"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
+<div class="tablewrap">
+  <h3>Permit Register <span id="t-count" style="color:#aaa;font-weight:400"></span></h3>
+  <table>
+    <thead><tr>
+      <th onclick="sortBy('id')">#</th><th onclick="sortBy('name')">Permit</th>
+      <th onclick="sortBy('auth')">Authority</th><th onclick="sortBy('phase')">Phase</th>
+      <th onclick="sortBy('days')">Lead</th><th onclick="sortBy('cost')">Cost</th>
+      <th onclick="sortBy('status')">Status</th><th onclick="sortBy('risk')">Risk</th>
+    </tr></thead>
+    <tbody id="tbody"></tbody>
+  </table>
+</div>
 
-        <!-- ===== TIMELINE TAB ===== -->
-        <div id="timeline" class="tab-content">
-            <div class="timeline-container">
-                <h3 style="margin-bottom: 30px; color: #667eea;">Gantt Chart - Project Timeline (18+ months)</h3>
-                <div class="gantt-chart">
-                    <div class="gantt-labels">
-                        <div style="height: 40px;"></div>
-                        <div class="permit-timeline-row"><span class="permit-label">1. Company Reg.</span></div>
-                        <div class="permit-timeline-row"><span class="permit-label">2. BOI Promotion</span></div>
-                        <div class="permit-timeline-row"><span class="permit-label">3. Foreign Biz Lic.</span></div>
-                        <div class="permit-timeline-row"><span class="permit-label">4. Land Zoning</span></div>
-                        <div class="permit-timeline-row"><span class="permit-label">5. EIA</span></div>
-                        <div class="permit-timeline-row"><span class="permit-label">6. Building Permit</span></div>
-                        <div class="permit-timeline-row"><span class="permit-label">7. Road Access</span></div>
-                        <div class="permit-timeline-row"><span class="permit-label">8. Grid Connection</span></div>
-                        <div class="permit-timeline-row"><span class="permit-label">9. Power Avail.</span></div>
-                        <div class="permit-timeline-row"><span class="permit-label">10. HV Substation</span></div>
-                        <div class="permit-timeline-row"><span class="permit-label">11. Water Supply</span></div>
-                        <div class="permit-timeline-row"><span class="permit-label">12. Wastewater</span></div>
-                        <div class="permit-timeline-row"><span class="permit-label">13. Fire Safety</span></div>
-                        <div class="permit-timeline-row"><span class="permit-label">14. Generator</span></div>
-                        <div class="permit-timeline-row"><span class="permit-label">15. Telecom</span></div>
-                        <div class="permit-timeline-row"><span class="permit-label">16. Electrical Insp.</span></div>
-                        <div class="permit-timeline-row"><span class="permit-label">17. Fire Insp.</span></div>
-                        <div class="permit-timeline-row"><span class="permit-label">18. Build. Completion</span></div>
-                        <div class="permit-timeline-row"><span class="permit-label">19. Occupancy Cert.</span></div>
-                        <div class="permit-timeline-row"><span class="permit-label">20. Utility Accept.</span></div>
-                        <div class="permit-timeline-row"><span class="permit-label">21. Factory License</span></div>
-                        <div class="permit-timeline-row"><span class="permit-label">22. PDPA</span></div>
-                        <div class="permit-timeline-row"><span class="permit-label">23. Cybersecurity</span></div>
-                    </div>
+<div class="modal" id="modal" onclick="if(event.target.id==='modal')closeModal()">
+  <div class="mc" id="mc"></div>
+</div>
 
-                    <div class="gantt-bars">
-                        <div class="gantt-months" style="width: 100%; z-index: 10;">
-                            <div class="gantt-month">M1-3</div>
-                            <div class="gantt-month">M3-6</div>
-                            <div class="gantt-month">M6-9</div>
-                            <div class="gantt-month">M9-12</div>
-                            <div class="gantt-month">M12-15</div>
-                            <div class="gantt-month">M15-18</div>
-                        </div>
+<script>
+const PH={1:"Development",2:"Design & Planning",3:"Construction",4:"Commissioning",5:"Operations"};
+const PHC={1:"#FF6B6B",2:"#4ECDC4",3:"#FFB347",4:"#95E1D3",5:"#A8E6CF"};
+const STC={completed:"#51CF66","in-progress":"#4DABF7",pending:"#FFB000"};
+const STL={completed:"Completed","in-progress":"In Progress",pending:"Pending"};
+const RKC={crit:"#e03131",high:"#e8590c",medium:"#1c7ed6",low:"#2f9e44"};
+const RKL={crit:"Critical",high:"High",medium:"Medium",low:"Low"};
 
-                        <!-- Permit bars -->
-                        <div class="permit-timeline-row"><div class="gantt-bar" style="width: 10%; margin-left: 0%;" onclick="showPermitModal(1)"><div class="gantt-tooltip">Company Reg. (30 days)</div></div></div>
-                        <div class="permit-timeline-row"><div class="gantt-bar critical" style="width: 40%; margin-left: 5%;" onclick="showPermitModal(2)"><div class="gantt-tooltip">BOI (120 days) - CRITICAL</div></div></div>
-                        <div class="permit-timeline-row"><div class="gantt-bar" style="width: 20%; margin-left: 5%;" onclick="showPermitModal(3)"><div class="gantt-tooltip">FBL (60 days)</div></div></div>
-                        <div class="permit-timeline-row"><div class="gantt-bar" style="width: 10%; margin-left: 0%;" onclick="showPermitModal(4)"><div class="gantt-tooltip">Land Zoning (30 days)</div></div></div>
-                        <div class="permit-timeline-row"><div class="gantt-bar critical" style="width: 60%; margin-left: 5%;" onclick="showPermitModal(5)"><div class="gantt-tooltip">EIA (180 days) - CRITICAL PATH</div></div></div>
-                        <div class="permit-timeline-row"><div class="gantt-bar" style="width: 20%; margin-left: 20%;" onclick="showPermitModal(6)"><div class="gantt-tooltip">Building (60 days)</div></div></div>
-                        <div class="permit-timeline-row"><div class="gantt-bar" style="width: 15%; margin-left: 20%;" onclick="showPermitModal(7)"><div class="gantt-tooltip">Road Access (45 days)</div></div></div>
-                        <div class="permit-timeline-row"><div class="gantt-bar" style="width: 20%; margin-left: 20%;" onclick="showPermitModal(8)"><div class="gantt-tooltip">Grid Connection (60 days)</div></div></div>
-                        <div class="permit-timeline-row"><div class="gantt-bar" style="width: 10%; margin-left: 5%;" onclick="showPermitModal(9)"><div class="gantt-tooltip">Power Avail. (30 days)</div></div></div>
-                        <div class="permit-timeline-row"><div class="gantt-bar" style="width: 30%; margin-left: 20%;" onclick="showPermitModal(10)"><div class="gantt-tooltip">HV Substation (90 days)</div></div></div>
-                        <div class="permit-timeline-row"><div class="gantt-bar" style="width: 15%; margin-left: 30%;" onclick="showPermitModal(11)"><div class="gantt-tooltip">Water (45 days)</div></div></div>
-                        <div class="permit-timeline-row"><div class="gantt-bar" style="width: 15%; margin-left: 30%;" onclick="showPermitModal(12)"><div class="gantt-tooltip">Wastewater (45 days)</div></div></div>
-                        <div class="permit-timeline-row"><div class="gantt-bar" style="width: 10%; margin-left: 30%;" onclick="showPermitModal(13)"><div class="gantt-tooltip">Fire Safety (30 days)</div></div></div>
-                        <div class="permit-timeline-row"><div class="gantt-bar" style="width: 20%; margin-left: 30%;" onclick="showPermitModal(14)"><div class="gantt-tooltip">Generator (60 days)</div></div></div>
-                        <div class="permit-timeline-row"><div class="gantt-bar" style="width: 15%; margin-left: 30%;" onclick="showPermitModal(15)"><div class="gantt-tooltip">Telecom (45 days)</div></div></div>
-                        <div class="permit-timeline-row"><div class="gantt-bar completed" style="width: 5%; margin-left: 48%;" onclick="showPermitModal(16)"><div class="gantt-tooltip">Electrical Insp. (14 days)</div></div></div>
-                        <div class="permit-timeline-row"><div class="gantt-bar" style="width: 2%; margin-left: 52%;" onclick="showPermitModal(17)"><div class="gantt-tooltip">Fire Insp. (7 days)</div></div></div>
-                        <div class="permit-timeline-row"><div class="gantt-bar" style="width: 3%; margin-left: 52%;" onclick="showPermitModal(18)"><div class="gantt-tooltip">Build. Completion (7 days)</div></div></div>
-                        <div class="permit-timeline-row"><div class="gantt-bar" style="width: 5%; margin-left: 52%;" onclick="showPermitModal(19)"><div class="gantt-tooltip">Occupancy (14 days)</div></div></div>
-                        <div class="permit-timeline-row"><div class="gantt-bar" style="width: 7%; margin-left: 52%;" onclick="showPermitModal(20)"><div class="gantt-tooltip">Utility Accept. (21 days)</div></div></div>
-                        <div class="permit-timeline-row"><div class="gantt-bar" style="width: 10%; margin-left: 53%;" onclick="showPermitModal(21)"><div class="gantt-tooltip">Factory License (30 days)</div></div></div>
-                        <div class="permit-timeline-row"><div class="gantt-bar" style="width: 10%; margin-left: 53%;" onclick="showPermitModal(22)"><div class="gantt-tooltip">PDPA (30 days)</div></div></div>
-                        <div class="permit-timeline-row"><div class="gantt-bar" style="width: 10%; margin-left: 53%;" onclick="showPermitModal(23)"><div class="gantt-tooltip">Cybersecurity (30 days)</div></div></div>
-                    </div>
-                </div>
-            </div>
-        </div>
+const P=[
+{id:1,name:"Company Registration",auth:"DBD",phase:1,days:30,cost:5000,risk:"low",status:"completed",gs:0,gd:1,form:"https://www.dbd.go.th/th/register-business",docs:["Registration form","Articles of Association","Shareholder IDs","Capital proof (1M THB)","Board resolution"]},
+{id:2,name:"BOI Promotion Certificate",auth:"BOI",phase:1,days:120,cost:0,risk:"crit",status:"completed",gs:0.5,gd:4,form:"https://boi-investment.boi.go.th/public/",docs:["Form F PA PP 04","ERC Power Confirmation (MANDATORY)","3-yr financials","PUE modeling","Thailand Benefit Plan"]},
+{id:3,name:"Foreign Business License",auth:"DBD",phase:1,days:60,cost:10000,risk:"low",status:"completed",gs:0.5,gd:2,form:"https://www.dbd.go.th/th/foreign-business-license",docs:["FBL form (P.13)","Company registration","THB 2M capital proof","Business plan (Thai)","Investor docs"]},
+{id:4,name:"Land Use & Zoning",auth:"DPW",phase:1,days:30,cost:2000,risk:"low",status:"completed",gs:0,gd:1,form:"https://www.dlt.go.th/",docs:["Land title (Chanote)","Zoning request form","Site plan","Land-use docs","Town planning map"]},
+{id:5,name:"Environmental Impact Assessment",auth:"ONEP",phase:1,days:180,cost:350000,risk:"crit",status:"completed",gs:0.5,gd:6,form:"https://www.onep.go.th/",docs:["Screening & TOR","Full EIA report","Baseline data","Mitigation plans","Community consultation"]},
+{id:6,name:"Building Construction Permit",auth:"DPW",phase:2,days:60,cost:15000,risk:"crit",status:"completed",gs:6,gd:2,form:"https://www.dlt.go.th/",docs:["Permit application","Architectural plans","Structural designs","MEP specs","Fire safety plans"]},
+{id:7,name:"Road Access / Highway",auth:"DPW",phase:2,days:45,cost:8000,risk:"high",status:"in-progress",gs:6,gd:1.5,form:"https://www.dlt.go.th/",docs:["Access application","Site plan","Traffic study","Road design","Engineering cert"]},
+{id:8,name:"Grid Connection Approval",auth:"PEA/MEA",phase:2,days:60,cost:75000,risk:"high",status:"completed",gs:2,gd:2,form:"https://www.pea.co.th/",docs:["Connection application","Single-line diagram","Load calculations","Substation design","Distribution design"]},
+{id:9,name:"Power Availability (ERC)",auth:"ERC",phase:2,days:30,cost:0,risk:"crit",status:"completed",gs:0.5,gd:1,form:"https://www.erc.or.th/",docs:["Power requirement letter","Load forecast","Project specs","Site map","Grid plans"]},
+{id:10,name:"HV Substation Approval",auth:"PEA/MEA",phase:2,days:90,cost:150000,risk:"high",status:"completed",gs:6,gd:3,form:"https://www.pea.co.th/",docs:["Substation design","Electrical specs","Safety plan","Environmental assessment","Land control"]},
+{id:11,name:"Water Supply Connection",auth:"MWA/PWA",phase:3,days:45,cost:30000,risk:"low",status:"completed",gs:8,gd:1.5,form:"https://www.mwa.co.th/",docs:["Connection application","Demand calculation","Supply drawings","Tank design","Routing plan"]},
+{id:12,name:"Wastewater / Drainage",auth:"MWA",phase:3,days:45,cost:37500,risk:"low",status:"completed",gs:8,gd:1.5,form:"https://www.mwa.co.th/",docs:["Discharge application","Treatment design","Quality standards","Drainage design","Monitoring plan"]},
+{id:13,name:"Fire Protection System",auth:"DPW",phase:3,days:30,cost:115000,risk:"high",status:"completed",gs:8,gd:1,form:"https://www.dlt.go.th/",docs:["Fire safety plan","Detection design","Suppression design","Emergency lighting","Evacuation plan"]},
+{id:14,name:"Generator & Fuel Storage",auth:"DOEB",phase:3,days:60,cost:15000,risk:"high",status:"in-progress",gs:8,gd:2,form:"https://www.doeb.go.th/",docs:["Generator specs","Fuel tank design","Secondary containment (110%)","Safety plan","Test schedule"]},
+{id:15,name:"Telecom / Fiber",auth:"NBTC",phase:3,days:45,cost:10000,risk:"low",status:"in-progress",gs:8,gd:1.5,form:"https://www.nbtc.go.th/",docs:["Service application","Network architecture","Coverage map","Tech specs","Security plan"]},
+{id:16,name:"Electrical Inspection",auth:"PEA/MEA",phase:3,days:14,cost:5000,risk:"low",status:"in-progress",gs:10,gd:0.5,form:"https://www.pea.co.th/",docs:["As-built design","Equipment certs","Load verification","Grounding compliance","Single-line diagram"]},
+{id:17,name:"Fire Safety Inspection",auth:"Fire Authority",phase:4,days:7,cost:0,risk:"low",status:"in-progress",gs:11,gd:0.4,form:"https://www.dlt.go.th/",docs:["Test certificates","Lighting verification","Extinguisher cert","Route verification","Training records"]},
+{id:18,name:"Building Completion",auth:"DPW",phase:4,days:7,cost:3000,risk:"low",status:"in-progress",gs:11,gd:0.4,form:"https://www.dlt.go.th/",docs:["As-built drawings","Structural cert","Material tests","MEP reports","QA docs"]},
+{id:19,name:"Occupancy Certificate",auth:"DPW",phase:4,days:14,cost:2000,risk:"high",status:"in-progress",gs:11.3,gd:0.6,form:"https://www.dlt.go.th/",docs:["Completion approval","Fire approval","Electrical approval","Utility connections","Insurance cert"]},
+{id:20,name:"Commissioning & Utility Accept.",auth:"Utilities",phase:4,days:21,cost:22500,risk:"low",status:"pending",gs:11.5,gd:0.8,form:"https://www.pea.co.th/",docs:["Electrical commissioning","Water testing","Wastewater verification","Fire test","Performance certs"]},
+{id:21,name:"Factory License",auth:"DIW",phase:5,days:30,cost:5000,risk:"low",status:"pending",gs:12,gd:1,form:"https://www.diw.go.th/",docs:["License application","Building cert","Environmental assessment","Worker safety plan","Waste plan"]},
+{id:22,name:"PDPA Compliance",auth:"PDPC",phase:5,days:30,cost:0,risk:"low",status:"pending",gs:12,gd:1,form:"https://www.pdpa.go.th/",docs:["Protection policy","Privacy notices","Processing agreements","Breach response","Training records"]},
+{id:23,name:"Cybersecurity Compliance",auth:"NCSA",phase:5,days:30,cost:0,risk:"low",status:"pending",gs:12,gd:1,form:"https://www.ncsa.go.th/",docs:["Security assessment","Incident response","Access control","Disaster recovery","ISO 27001 / SOC 2"]}
+];
 
-        <!-- ===== DEPENDENCIES TAB ===== -->
-        <div id="dependencies" class="tab-content">
-            <div class="dependency-section">
-                <h3>Critical Blocking Permits</h3>
-                <p style="color: #666; margin-bottom: 20px; font-size: 0.9em;">These permits block multiple others from starting</p>
+let F={phase:null,status:null,risk:null};
+let sortKey='id',sortDir=1;
 
-                <div class="blocking-permits">
-                    <!-- Permit 5: EIA -->
-                    <div class="blocking-card">
-                        <div class="blocking-header">
-                            <div class="blocking-permit-num">5</div>
-                            <span>Environmental Impact Assessment (EIA)</span>
-                        </div>
-                        <ul class="blocking-list">
-                            <li>6. Building Construction Permit</li>
-                            <li>11. Water Supply Connection</li>
-                            <li>12. Wastewater / Drainage Connection</li>
-                            <li>14. Generator & Fuel Storage</li>
-                            <li>21. Factory License</li>
-                        </ul>
-                        <div class="risk-indicator risk-high">CRITICAL PATH - 180 days</div>
-                    </div>
+const filtered=()=>P.filter(p=>(!F.phase||p.phase==F.phase)&&(!F.status||p.status==F.status)&&(!F.risk||p.risk==F.risk));
+const fmt=n=>n>=1000?(n/1000).toLocaleString(undefined,{maximumFractionDigits:0})+'K':n;
 
-                    <!-- Permit 2: BOI -->
-                    <div class="blocking-card">
-                        <div class="blocking-header">
-                            <div class="blocking-permit-num">2</div>
-                            <span>BOI Promotion Certificate</span>
-                        </div>
-                        <ul class="blocking-list">
-                            <li>Tax exemption activation</li>
-                            <li>Thailand Benefit Plan implementation</li>
-                            <li>Quarterly e-Monitoring compliance</li>
-                        </ul>
-                        <div class="risk-indicator risk-high">Prerequisite: Power Confirmation Required</div>
-                    </div>
+function buildChips(){
+  document.getElementById('phaseChips').innerHTML=Object.keys(PH).map(k=>`<span class="chip ph${k}" data-dim="phase" data-val="${k}" onclick="toggle('phase','${k}')">${PH[k]}</span>`).join('');
+  document.getElementById('statusChips').innerHTML=Object.keys(STL).map(k=>`<span class="chip st-${k[0]}" data-dim="status" data-val="${k}" onclick="toggle('status','${k}')">${STL[k]}</span>`).join('');
+  document.getElementById('riskChips').innerHTML=Object.keys(RKL).map(k=>`<span class="chip rk-${k}" data-dim="risk" data-val="${k}" onclick="toggle('risk','${k}')">${RKL[k]}</span>`).join('');
+}
+function syncChips(){
+  document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',F[c.dataset.dim]==c.dataset.val));
+}
+function toggle(dim,val){ F[dim]=(F[dim]==val)?null:val; refresh(); }
+function resetFilters(){ F={phase:null,status:null,risk:null}; refresh(); }
 
-                    <!-- Permit 6: Building Permit -->
-                    <div class="blocking-card">
-                        <div class="blocking-header">
-                            <div class="blocking-permit-num">6</div>
-                            <span>Building Construction Permit</span>
-                        </div>
-                        <ul class="blocking-list">
-                            <li>7. Road Access Approval</li>
-                            <li>11. Water Supply Connection</li>
-                            <li>12. Wastewater Connection</li>
-                            <li>13. Fire Protection System</li>
-                            <li>14. Generator & Fuel Storage</li>
-                            <li>15. Telecommunications</li>
-                            <li>18. Building Completion Inspection</li>
-                        </ul>
-                        <div class="risk-indicator risk-high">GATES CONSTRUCTION</div>
-                    </div>
+const $=id=>document.getElementById(id);
+function updKPI(){
+  const d=filtered();
+  $('k-total').textContent=d.length;
+  $('k-done').textContent=d.filter(p=>p.status=='completed').length;
+  $('k-prog').textContent=d.filter(p=>p.status=='in-progress').length;
+  $('k-pend').textContent=d.filter(p=>p.status=='pending').length;
+  $('k-days').textContent=d.reduce((s,p)=>s+p.days,0);
+  $('k-cost').textContent=fmt(d.reduce((s,p)=>s+p.cost,0));
+}
 
-                    <!-- Permit 9: Power Availability -->
-                    <div class="blocking-card">
-                        <div class="blocking-header">
-                            <div class="blocking-permit-num">9</div>
-                            <span>Power Availability Confirmation (ERC)</span>
-                        </div>
-                        <ul class="blocking-list">
-                            <li>2. BOI Promotion Certificate</li>
-                            <li>8. Grid Connection Approval</li>
-                        </ul>
-                        <div class="risk-indicator risk-high">NOW MANDATORY - Must have before BOI application</div>
-                    </div>
-                </div>
-            </div>
+function updTable(){
+  let d=[...filtered()].sort((a,b)=>{let x=a[sortKey],y=b[sortKey];return (x>y?1:x<y?-1:0)*sortDir;});
+  document.getElementById('t-count').textContent=`(${d.length} of 23)`;
+  document.getElementById('tbody').innerHTML=d.map(p=>`
+    <tr class="row" onclick="openModal(${p.id})">
+      <td>${p.id}</td><td><b>${p.name}</b></td><td>${p.auth}</td>
+      <td><span class="dot" style="background:${PHC[p.phase]}"></span>${PH[p.phase]}</td>
+      <td>${p.days}d</td><td>${p.cost?fmt(p.cost):'—'}</td>
+      <td><span class="tag st-${p.status[0]}">${STL[p.status]}</span></td>
+      <td><span class="tag rk-${p.risk}">${RKL[p.risk]}</span></td>
+    </tr>`).join('');
+}
+function sortBy(k){ sortDir=(sortKey==k)?-sortDir:1; sortKey=k; updTable(); }
 
-            <div class="dependency-flow">
-                <h3 style="color: #667eea; margin-bottom: 20px;">Critical Dependency Flow</h3>
+let cStatus,cPhase,cBudget,cRisk,cGantt;
+Chart.defaults.font.family="Segoe UI";Chart.defaults.font.size=11;
 
-                <div class="flow-item">
-                    <div class="flow-box">1. Company Reg.</div>
-                    <div class="flow-arrow"></div>
-                </div>
+function makeCharts(){
+  const d=filtered();
+  const sc={completed:0,"in-progress":0,pending:0};d.forEach(p=>sc[p.status]++);
+  cStatus=new Chart(statusChart,{type:'doughnut',data:{labels:Object.keys(STL).map(k=>STL[k]),datasets:[{data:Object.keys(STL).map(k=>sc[k]),backgroundColor:Object.keys(STL).map(k=>STC[k]),borderWidth:2,borderColor:'#fff'}]},
+    options:{cutout:'62%',plugins:{legend:{position:'bottom',labels:{boxWidth:10,padding:8}}},onClick:(e,el)=>{if(el.length)toggle('status',Object.keys(STL)[el[0].index])}}});
+  const pc=[1,2,3,4,5].map(ph=>d.filter(p=>p.phase==ph).length);
+  cPhase=new Chart(phaseChart,{type:'bar',data:{labels:Object.values(PH),datasets:[{data:pc,backgroundColor:Object.values(PHC),borderRadius:6}]},
+    options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{precision:0}},x:{ticks:{maxRotation:35,minRotation:0,font:{size:9}}}},onClick:(e,el)=>{if(el.length)toggle('phase',String(el[0].index+1))}}});
+  const bc=[1,2,3,4,5].map(ph=>d.filter(p=>p.phase==ph).reduce((s,p)=>s+p.cost,0));
+  cBudget=new Chart(budgetChart,{type:'bar',data:{labels:Object.values(PH),datasets:[{data:bc,backgroundColor:'#764ba2',borderRadius:6}]},
+    options:{plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>fmt(c.raw)+' THB'}}},scales:{y:{beginAtZero:true,ticks:{callback:v=>fmt(v)}},x:{ticks:{maxRotation:35,font:{size:9}}}},onClick:(e,el)=>{if(el.length)toggle('phase',String(el[0].index+1))}}});
+  const rk={crit:0,high:0,medium:0,low:0};d.forEach(p=>rk[p.risk]++);
+  cRisk=new Chart(riskChart,{type:'doughnut',data:{labels:Object.values(RKL),datasets:[{data:Object.keys(RKL).map(k=>rk[k]),backgroundColor:Object.values(RKC),borderWidth:2,borderColor:'#fff'}]},
+    options:{cutout:'62%',plugins:{legend:{position:'bottom',labels:{boxWidth:10,padding:8}}},onClick:(e,el)=>{if(el.length)toggle('risk',Object.keys(RKL)[el[0].index])}}});
+  const rows=[...d].sort((a,b)=>a.gs-b.gs||a.id-b.id);
+  cGantt=new Chart(ganttChart,{type:'bar',data:{labels:rows.map(p=>p.id+'. '+p.name),datasets:[{data:rows.map(p=>[p.gs,p.gs+p.gd]),backgroundColor:rows.map(p=>PHC[p.phase]),borderRadius:5,barPercentage:.78}]},
+    options:{indexAxis:'y',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>{const p=rows[c.dataIndex];return `${p.days} days · ${PH[p.phase]} · ${STL[p.status]}`;}}}},
+    scales:{x:{min:0,max:13,title:{display:true,text:'Project month'},ticks:{stepSize:1}},y:{ticks:{font:{size:9},autoSkip:false}}},
+    onClick:(e,el)=>{if(el.length)openModal(rows[el[0].index].id)}}});
+}
+function destroyCharts(){[cStatus,cPhase,cBudget,cRisk,cGantt].forEach(c=>c&&c.destroy());}
 
-                <div class="flow-item">
-                    <div class="flow-box">2. BOI + 9. Power</div>
-                    <div class="flow-arrow"></div>
-                </div>
-
-                <div class="flow-item">
-                    <div class="flow-box">4. Land Zoning</div>
-                    <div class="flow-arrow"></div>
-                </div>
-
-                <div class="flow-item">
-                    <div class="flow-box">5. EIA (180 days)</div>
-                    <div class="flow-arrow"></div>
-                </div>
-
-                <div class="flow-item">
-                    <div class="flow-box">6. Building Permit</div>
-                    <div class="flow-arrow"></div>
-                </div>
-
-                <div class="flow-item">
-                    <div class="flow-box">11,12,13,14,15,16 (Parallel)</div>
-                    <div class="flow-arrow"></div>
-                </div>
-
-                <div class="flow-item">
-                    <div class="flow-box">17,18,19,20 (Commissioning)</div>
-                    <div class="flow-arrow"></div>
-                </div>
-
-                <div class="flow-item">
-                    <div class="flow-box">21,22,23 (Operations)</div>
-                </div>
-            </div>
-
-            <div class="dependency-section">
-                <h3>Parallel Work Streams (Can Run Simultaneously)</h3>
-                <p style="color: #666; margin-bottom: 20px; font-size: 0.9em;">These permits don't depend on each other and can be pursued in parallel</p>
-
-                <div class="blocking-permits">
-                    <div class="blocking-card" style="background: linear-gradient(135deg, #E8F7E3 0%, #D0F8F3 100%); border-left-color: #51CF66;">
-                        <div class="blocking-header" style="color: #51CF66;">
-                            <div class="blocking-permit-num" style="background: #51CF66;">A</div>
-                            <span>Parallel Stream A (Design/Construction)</span>
-                        </div>
-                        <ul class="blocking-list" style="color: #333;">
-                            <li>8. Grid Connection</li>
-                            <li>10. HV Substation</li>
-                            <li>7. Road Access</li>
-                            <li>Can start once: Building Permit approved</li>
-                        </ul>
-                    </div>
-
-                    <div class="blocking-card" style="background: linear-gradient(135deg, #E8F4F8 0%, #D0EEF8 100%); border-left-color: #0096D6;">
-                        <div class="blocking-header" style="color: #0096D6;">
-                            <div class="blocking-permit-num" style="background: #0096D6;">B</div>
-                            <span>Parallel Stream B (Utilities)</span>
-                        </div>
-                        <ul class="blocking-list" style="color: #333;">
-                            <li>11. Water Supply</li>
-                            <li>12. Wastewater</li>
-                            <li>13. Fire Safety</li>
-                            <li>14. Generator</li>
-                            <li>15. Telecom/Fiber</li>
-                            <li>Can start once: Building Permit approved</li>
-                        </ul>
-                    </div>
-
-                    <div class="blocking-card" style="background: linear-gradient(135deg, #FFE8CC 0%, #FFD699 100%); border-left-color: #FF9500;">
-                        <div class="blocking-header" style="color: #FF9500;">
-                            <div class="blocking-permit-num" style="background: #FF9500;">C</div>
-                            <span>Parallel Stream C (Commissioning)</span>
-                        </div>
-                        <ul class="blocking-list" style="color: #333;">
-                            <li>17. Fire Safety Inspection</li>
-                            <li>18. Building Completion</li>
-                            <li>19. Occupancy Certificate</li>
-                            <li>20. Utility Acceptance</li>
-                            <li>Can start once: All construction complete</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ===== PHASES TAB ===== -->
-        <div id="phases" class="tab-content">
-            <div class="phase-grid">
-                <!-- Phase 1 -->
-                <div class="phase-card">
-                    <div class="phase-header-card p1">PHASE 1: DEVELOPMENT (5)</div>
-                    <div class="phase-content">
-                        <div class="permit-item critical" onclick="showPermitModal(1)"><span class="permit-num">1.</span> Company Registration</div>
-                        <div class="permit-item critical" onclick="showPermitModal(2)"><span class="permit-num">2.</span> BOI Promotion</div>
-                        <div class="permit-item" onclick="showPermitModal(3)"><span class="permit-num">3.</span> Foreign Biz License</div>
-                        <div class="permit-item critical" onclick="showPermitModal(4)"><span class="permit-num">4.</span> Land Zoning</div>
-                        <div class="permit-item critical" onclick="showPermitModal(5)"><span class="permit-num">5.</span> EIA</div>
-                    </div>
-                </div>
-
-                <!-- Phase 2 -->
-                <div class="phase-card">
-                    <div class="phase-header-card p2">PHASE 2: DESIGN & PLANNING (5)</div>
-                    <div class="phase-content">
-                        <div class="permit-item critical" onclick="showPermitModal(6)"><span class="permit-num">6.</span> Building Permit</div>
-                        <div class="permit-item" onclick="showPermitModal(7)"><span class="permit-num">7.</span> Road Access</div>
-                        <div class="permit-item" onclick="showPermitModal(8)"><span class="permit-num">8.</span> Grid Connection</div>
-                        <div class="permit-item critical" onclick="showPermitModal(9)"><span class="permit-num">9.</span> Power Availability</div>
-                        <div class="permit-item" onclick="showPermitModal(10)"><span class="permit-num">10.</span> HV Substation</div>
-                    </div>
-                </div>
-
-                <!-- Phase 3 -->
-                <div class="phase-card">
-                    <div class="phase-header-card p3">PHASE 3: CONSTRUCTION (6)</div>
-                    <div class="phase-content">
-                        <div class="permit-item" onclick="showPermitModal(11)"><span class="permit-num">11.</span> Water Supply</div>
-                        <div class="permit-item" onclick="showPermitModal(12)"><span class="permit-num">12.</span> Wastewater</div>
-                        <div class="permit-item" onclick="showPermitModal(13)"><span class="permit-num">13.</span> Fire Safety</div>
-                        <div class="permit-item" onclick="showPermitModal(14)"><span class="permit-num">14.</span> Generator & Fuel</div>
-                        <div class="permit-item" onclick="showPermitModal(15)"><span class="permit-num">15.</span> Telecom/Fiber</div>
-                        <div class="permit-item" onclick="showPermitModal(16)"><span class="permit-num">16.</span> Electrical Insp.</div>
-                    </div>
-                </div>
-
-                <!-- Phase 4 -->
-                <div class="phase-card">
-                    <div class="phase-header-card p4">PHASE 4: COMMISSIONING (4)</div>
-                    <div class="phase-content">
-                        <div class="permit-item" onclick="showPermitModal(17)"><span class="permit-num">17.</span> Fire Inspection</div>
-                        <div class="permit-item critical" onclick="showPermitModal(18)"><span class="permit-num">18.</span> Building Completion</div>
-                        <div class="permit-item critical" onclick="showPermitModal(19)"><span class="permit-num">19.</span> Occupancy Cert.</div>
-                        <div class="permit-item" onclick="showPermitModal(20)"><span class="permit-num">20.</span> Utility Accept.</div>
-                    </div>
-                </div>
-
-                <!-- Phase 5 -->
-                <div class="phase-card">
-                    <div class="phase-header-card p5">PHASE 5: OPERATIONS (3)</div>
-                    <div class="phase-content">
-                        <div class="permit-item" onclick="showPermitModal(21)"><span class="permit-num">21.</span> Factory License</div>
-                        <div class="permit-item" onclick="showPermitModal(22)"><span class="permit-num">22.</span> PDPA Compliance</div>
-                        <div class="permit-item" onclick="showPermitModal(23)"><span class="permit-num">23.</span> Cybersecurity</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ===== AUTHORITIES TAB ===== -->
-        <div id="authorities" class="tab-content">
-            <div class="authorities-grid">
-                <div class="authority-card">
-                    <div class="authority-name">Department of Business Development (DBD)</div>
-                    <ul class="authority-permits">
-                        <li>1. Company Registration</li>
-                        <li>3. Foreign Business License</li>
-                    </ul>
-                    <div class="authority-contact">
-                        <div class="contact-item">
-                            <div class="contact-label">Website:</div>
-                            <div class="contact-value"><a href="https://www.dbd.go.th" target="_blank">www.dbd.go.th</a></div>
-                        </div>
-                        <div class="contact-item">
-                            <div class="contact-label">Phone:</div>
-                            <div class="contact-value">0-2141-4271-9</div>
-                        </div>
-                        <div class="contact-item">
-                            <div class="contact-label">Address:</div>
-                            <div class="contact-value">Bangkok, Thailand</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="authority-card">
-                    <div class="authority-name">Thailand Board of Investment (BOI)</div>
-                    <ul class="authority-permits">
-                        <li>2. BOI Promotion Certificate</li>
-                    </ul>
-                    <div class="authority-contact">
-                        <div class="contact-item">
-                            <div class="contact-label">Website:</div>
-                            <div class="contact-value"><a href="https://www.boi.go.th" target="_blank">www.boi.go.th</a></div>
-                        </div>
-                        <div class="contact-item">
-                            <div class="contact-label">Division 4:</div>
-                            <div class="contact-value">+66-2-553-8214</div>
-                        </div>
-                        <div class="contact-item">
-                            <div class="contact-label">Monitoring:</div>
-                            <div class="contact-value">+66-2-553-8140</div>
-                        </div>
-                        <div class="contact-item">
-                            <div class="contact-label">Email:</div>
-                            <div class="contact-value">saraban@boi.go.th</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="authority-card">
-                    <div class="authority-name">Department of Public Works (DPW)</div>
-                    <ul class="authority-permits">
-                        <li>4. Land Use & Zoning</li>
-                        <li>6. Building Permit</li>
-                        <li>7. Road Access</li>
-                    </ul>
-                    <div class="authority-contact">
-                        <div class="contact-item">
-                            <div class="contact-label">Website:</div>
-                            <div class="contact-value"><a href="https://www.dlt.go.th" target="_blank">www.dlt.go.th</a></div>
-                        </div>
-                        <div class="contact-item">
-                            <div class="contact-label">Phone:</div>
-                            <div class="contact-value">0-2243-9200</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="authority-card">
-                    <div class="authority-name">Office of Natural Resources (ONEP)</div>
-                    <ul class="authority-permits">
-                        <li>5. Environmental Impact Assessment</li>
-                    </ul>
-                    <div class="authority-contact">
-                        <div class="contact-item">
-                            <div class="contact-label">Website:</div>
-                            <div class="contact-value"><a href="https://www.onep.go.th" target="_blank">www.onep.go.th</a></div>
-                        </div>
-                        <div class="contact-item">
-                            <div class="contact-label">Phone:</div>
-                            <div class="contact-value">0-2298-3600</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="authority-card">
-                    <div class="authority-name">Provincial Electricity Authority (PEA) / MEA</div>
-                    <ul class="authority-permits">
-                        <li>8. Grid Connection</li>
-                        <li>10. HV Substation</li>
-                        <li>16. Electrical Energization</li>
-                    </ul>
-                    <div class="authority-contact">
-                        <div class="contact-item">
-                            <div class="contact-label">PEA Website:</div>
-                            <div class="contact-value"><a href="https://www.pea.co.th" target="_blank">www.pea.co.th</a></div>
-                        </div>
-                        <div class="contact-item">
-                            <div class="contact-label">PEA Phone:</div>
-                            <div class="contact-value">0-2399-9999</div>
-                        </div>
-                        <div class="contact-item">
-                            <div class="contact-label">MEA Website:</div>
-                            <div class="contact-value"><a href="https://www.mea.or.th" target="_blank">www.mea.or.th</a></div>
-                        </div>
-                        <div class="contact-item">
-                            <div class="contact-label">MEA Phone:</div>
-                            <div class="contact-value">0-2246-3888</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="authority-card">
-                    <div class="authority-name">Energy Regulatory Commission (ERC)</div>
-                    <ul class="authority-permits">
-                        <li>9. Power Availability Confirmation</li>
-                    </ul>
-                    <div class="authority-contact">
-                        <div class="contact-item">
-                            <div class="contact-label">Website:</div>
-                            <div class="contact-value"><a href="https://www.erc.or.th" target="_blank">www.erc.or.th</a></div>
-                        </div>
-                        <div class="contact-item">
-                            <div class="contact-label">Contact via:</div>
-                            <div class="contact-value">MEA/PEA Regional Office</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="authority-card">
-                    <div class="authority-name">Metropolitan/Provincial Waterworks (MWA/PWA)</div>
-                    <ul class="authority-permits">
-                        <li>11. Water Supply Connection</li>
-                        <li>12. Wastewater Discharge</li>
-                    </ul>
-                    <div class="authority-contact">
-                        <div class="contact-item">
-                            <div class="contact-label">MWA Website:</div>
-                            <div class="contact-value"><a href="https://www.mwa.co.th" target="_blank">www.mwa.co.th</a></div>
-                        </div>
-                        <div class="contact-item">
-                            <div class="contact-label">MWA Phone:</div>
-                            <div class="contact-value">0-2299-3000</div>
-                        </div>
-                        <div class="contact-item">
-                            <div class="contact-label">PWA Website:</div>
-                            <div class="contact-value"><a href="https://www.pwa.co.th" target="_blank">www.pwa.co.th</a></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="authority-card">
-                    <div class="authority-name">Department of Energy Business (DOEB)</div>
-                    <ul class="authority-permits">
-                        <li>14. Generator & Fuel Storage</li>
-                    </ul>
-                    <div class="authority-contact">
-                        <div class="contact-item">
-                            <div class="contact-label">Website:</div>
-                            <div class="contact-value"><a href="https://www.doeb.go.th" target="_blank">www.doeb.go.th</a></div>
-                        </div>
-                        <div class="contact-item">
-                            <div class="contact-label">Phone:</div>
-                            <div class="contact-value">0-2202-8300-4</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="authority-card">
-                    <div class="authority-name">National Broadcasting & Telecom Commission (NBTC)</div>
-                    <ul class="authority-permits">
-                        <li>15. Telecommunications/Fiber</li>
-                    </ul>
-                    <div class="authority-contact">
-                        <div class="contact-item">
-                            <div class="contact-label">Website:</div>
-                            <div class="contact-value"><a href="https://www.nbtc.go.th" target="_blank">www.nbtc.go.th</a></div>
-                        </div>
-                        <div class="contact-item">
-                            <div class="contact-label">Phone:</div>
-                            <div class="contact-value">0-2279-7800</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="authority-card">
-                    <div class="authority-name">Department of Industrial Works (DIW)</div>
-                    <ul class="authority-permits">
-                        <li>21. Factory License</li>
-                    </ul>
-                    <div class="authority-contact">
-                        <div class="contact-item">
-                            <div class="contact-label">Website:</div>
-                            <div class="contact-value"><a href="https://www.diw.go.th" target="_blank">www.diw.go.th</a></div>
-                        </div>
-                        <div class="contact-item">
-                            <div class="contact-label">Phone:</div>
-                            <div class="contact-value">0-2201-3000</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="authority-card">
-                    <div class="authority-name">Personal Data Protection Committee</div>
-                    <ul class="authority-permits">
-                        <li>22. PDPA Compliance</li>
-                    </ul>
-                    <div class="authority-contact">
-                        <div class="contact-item">
-                            <div class="contact-label">Website:</div>
-                            <div class="contact-value"><a href="https://www.pdpa.go.th" target="_blank">www.pdpa.go.th</a></div>
-                        </div>
-                        <div class="contact-item">
-                            <div class="contact-label">Phone:</div>
-                            <div class="contact-value">0-2141-9000</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="authority-card">
-                    <div class="authority-name">National Cyber Security Agency</div>
-                    <ul class="authority-permits">
-                        <li>23. Cybersecurity Compliance</li>
-                    </ul>
-                    <div class="authority-contact">
-                        <div class="contact-item">
-                            <div class="contact-label">Website:</div>
-                            <div class="contact-value"><a href="https://www.ncsa.go.th" target="_blank">www.ncsa.go.th</a></div>
-                        </div>
-                        <div class="contact-item">
-                            <div class="contact-label">Phone:</div>
-                            <div class="contact-value">0-2578-2000</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+function openModal(id){
+  const p=P.find(x=>x.id==id);
+  document.getElementById('mc').innerHTML=`
+    <div class="mh" style="background:linear-gradient(135deg,${PHC[p.phase]},#764ba2)">
+      <div class="n">${p.id}</div><h2>${p.name}</h2><button class="x" onclick="closeModal()">&times;</button>
     </div>
+    <div class="mb">
+      <div class="mrow"><span class="k">Authority</span><span>${p.auth}</span></div>
+      <div class="mrow"><span class="k">Phase</span><span>${PH[p.phase]}</span></div>
+      <div class="mrow"><span class="k">Lead Time</span><span>${p.days} days</span></div>
+      <div class="mrow"><span class="k">Cost</span><span>${p.cost?fmt(p.cost)+' THB':'No fee'}</span></div>
+      <div class="mrow"><span class="k">Status</span><span class="tag st-${p.status[0]}">${STL[p.status]}</span></div>
+      <div class="mrow"><span class="k">Risk</span><span class="tag rk-${p.risk}">${RKL[p.risk]}</span></div>
+      <h3 style="color:#667eea;margin:18px 0 4px;font-size:.95em">Documents Required</h3>
+      <ul class="docs">${p.docs.map(x=>`<li>${x}</li>`).join('')}</ul>
+      <a class="mlink" href="${p.form}" target="_blank">🌐 Open Official Portal</a>
+    </div>`;
+  document.getElementById('modal').classList.add('on');
+}
+function closeModal(){document.getElementById('modal').classList.remove('on');}
 
-    <!-- Permit Details Modal -->
-    <div id="permitModal" class="modal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closePermitModal()">&times;</span>
-            <div id="modalBody"></div>
-        </div>
-    </div>
-
-    <div class="footer">
-        <p>CHN1A GFL Cut-In Data Center | Complete Permit Management System | Last Updated: June 2026</p>
-    </div>
-
-    <script>
-        const permitData = {
-            1: { name: "Company Registration", authority: "DBD", leadTime: "30 days", cost: "~5,000 THB", desc: "Legal establishment of Thai company entity", docs: ["Registration form", "Articles of Association", "Shareholder IDs", "Capital proof (1M THB min)", "Board resolution"], form: "https://www.dbd.go.th/th/register-business", risk: "low" },
-            2: { name: "BOI Promotion Certificate", authority: "BOI", leadTime: "120 days", cost: "0 THB", desc: "Investment promotion (Category 8.2.1.1/8.2.1.2)", docs: ["Form F PA PP 04", "ERC Power Confirmation (MANDATORY)", "3-year financials", "PUE modeling", "Thailand Benefit Plan"], form: "https://boi-investment.boi.go.th/public/", risk: "high", critical: "CRITICAL - ERC power letter now mandatory" },
-            3: { name: "Foreign Business License", authority: "DBD", leadTime: "60 days", cost: "~10,000 THB", desc: "License for foreign investor operations", docs: ["FBL application (P.13)", "Company registration", "THB 2M capital proof", "Business plan in Thai", "Foreign investor documents"], form: "https://www.dbd.go.th/th/foreign-business-license", risk: "low", critical: "Conditional on foreign ownership" },
-            4: { name: "Land Use & Zoning Confirmation", authority: "DPW", leadTime: "30 days", cost: "~2,000 THB", desc: "Verification of land zoning for data center", docs: ["Land title (Chanote)", "Zoning request form", "Site plan", "Land use documentation", "Building plans summary"], form: "https://www.dlt.go.th/", risk: "low" },
-            5: { name: "Environmental Impact Assessment (EIA)", authority: "ONEP", leadTime: "180 days", cost: "~200-500K THB", desc: "Comprehensive environmental study", docs: ["EIA screening & TOR", "Full EIA report (80-150 pg)", "Baseline data", "Mitigation plans", "Community consultation"], form: "https://www.onep.go.th/", risk: "high", critical: "CRITICAL PATH - 180 days is bottleneck" },
-            6: { name: "Building Construction Permit", authority: "DPW", leadTime: "60 days", cost: "~15,000 THB", desc: "Approval for building construction", docs: ["Permit application", "Architectural plans", "Structural designs", "MEP specifications", "Fire safety plans"], form: "https://www.dlt.go.th/", risk: "high", critical: "GATES CONSTRUCTION" },
-            7: { name: "Road Access / Highway Connection", authority: "DPW", leadTime: "45 days", cost: "~8,000 THB", desc: "Approval for facility access", docs: ["Access application", "Site plan", "Traffic impact study", "Road design plans", "Engineering cert."], form: "https://www.dlt.go.th/", risk: "medium" },
-            8: { name: "Grid Connection Approval", authority: "PEA/MEA", leadTime: "60 days", cost: "~50-100K THB", desc: "Approval for electrical grid connection", docs: ["Application", "Single-line diagram", "Load calculations", "Substation design", "Power distribution"], form: "https://www.pea.co.th/ or https://www.mea.or.th", risk: "medium" },
-            9: { name: "Power Availability Confirmation", authority: "ERC", leadTime: "30 days", cost: "0 THB", desc: "Grid power availability confirmation", docs: ["Power requirement letter", "Load forecast", "Project specs", "Site map", "Grid plans"], form: "https://www.erc.or.th/", risk: "high", critical: "MANDATORY PREREQUISITE for BOI (new requirement)" },
-            10: { name: "High-Voltage Substation Approval", authority: "PEA/MEA", leadTime: "90 days", cost: "~100-200K THB", desc: "Design approval for on-site HV substation", docs: ["Substation design", "Electrical specs", "Safety plan", "Environmental assess.", "Land control proof"], form: "https://www.pea.co.th/ or https://www.mea.or.th", risk: "medium" },
-            11: { name: "Water Supply Connection", authority: "MWA/PWA", leadTime: "45 days", cost: "~20-40K THB", desc: "Fresh water supply connection", docs: ["Application", "Water demand calc", "Supply system design", "Tank design", "Site plan"], form: "https://www.mwa.co.th/ or https://www.pwa.co.th", risk: "low" },
-            12: { name: "Wastewater / Drainage Connection", authority: "MWA/PWA", leadTime: "45 days", cost: "~25-50K THB", desc: "Treatment and discharge of wastewater", docs: ["Application", "Treatment design", "Discharge standards", "Drainage design", "Monitoring plan"], form: "https://www.mwa.co.th/ or https://www.pwa.co.th", risk: "low" },
-            13: { name: "Fire Protection System Approval", authority: "DPW", leadTime: "30 days", cost: "~80-150K THB", desc: "Fire detection and suppression design", docs: ["Fire safety plan", "Detection design", "Suppression design", "Emergency lighting", "Evacuation plan"], form: "https://www.dlt.go.th/", risk: "medium" },
-            14: { name: "Generator & Fuel Storage Approval", authority: "DOEB", leadTime: "60 days", cost: "~10-20K THB", desc: "Backup power and fuel facility approval", docs: ["Generator specs", "Fuel tank design", "Secondary containment (110%)", "Safety plan", "Testing schedule"], form: "https://www.doeb.go.th/", risk: "medium" },
-            15: { name: "Telecommunications / Fiber Connection", authority: "NBTC", leadTime: "45 days", cost: "~5-15K THB", desc: "Telecom infrastructure approval", docs: ["Application", "Network architecture", "Service area map", "Technical specs", "Security plan"], form: "https://www.nbtc.go.th/", risk: "low" },
-            16: { name: "Electrical Inspection & Energization", authority: "PEA/MEA", leadTime: "14 days", cost: "~5,000 THB", desc: "Final electrical system inspection", docs: ["Final design", "Equipment certs", "Load verification", "Grounding compliance", "Single-line diagram"], form: "https://www.pea.co.th/ or https://www.mea.or.th", risk: "low" },
-            17: { name: "Fire Safety Inspection", authority: "DPW", leadTime: "7 days", cost: "0 THB", desc: "Final fire protection systems inspection", docs: ["System test certs", "Lighting tests", "Extinguisher cert", "Route verification", "Training records"], form: "https://www.dlt.go.th/", risk: "low" },
-            18: { name: "Building Completion Inspection", authority: "DPW", leadTime: "7 days", cost: "~3,000 THB", desc: "Final building completion verification", docs: ["As-built drawings", "Structural cert", "Material tests", "MEP reports", "QA documentation"], form: "https://www.dlt.go.th/", risk: "low" },
-            19: { name: "Occupancy Certificate", authority: "DPW", leadTime: "14 days", cost: "~2,000 THB", desc: "Final approval for facility occupancy", docs: ["Completion approval", "Fire inspection", "Electrical approval", "Utility proof", "Insurance cert"], form: "https://www.dlt.go.th/", risk: "low", critical: "GATEWAY TO OPERATIONS" },
-            20: { name: "Commissioning & Utility Acceptance", authority: "Utilities", leadTime: "21 days", cost: "~15-30K THB", desc: "Testing and acceptance of utilities", docs: ["Electrical commission", "Water test", "Wastewater test", "Fire test", "Performance certs"], form: "https://www.pea.co.th / https://www.mea.or.th", risk: "low" },
-            21: { name: "Factory License", authority: "DIW", leadTime: "30 days", cost: "~5,000 THB", desc: "Industrial operations license", docs: ["License application", "Building cert", "Environmental assess.", "Safety plan", "Waste plan"], form: "https://www.diw.go.th/", risk: "low" },
-            22: { name: "PDPA Compliance", authority: "PDPC", leadTime: "30 days", cost: "0 THB", desc: "Data protection compliance", docs: ["Protection policy", "Privacy notices", "Processing agreements", "Breach response", "Training records"], form: "https://www.pdpa.go.th/", risk: "low" },
-            23: { name: "Cybersecurity Compliance", authority: "NCSA", leadTime: "30 days", cost: "0 THB", desc: "Critical Infrastructure security", docs: ["Security assessment", "Incident response", "Access control", "Disaster recovery", "ISO 27001"], form: "https://www.ncsa.go.th/", risk: "low" }
-        };
-
-        function showPermitModal(permitId) {
-            const p = permitData[permitId];
-            let riskHTML = '';
-            if (p.critical) {
-                riskHTML = `<div class="risk-indicator risk-high">${p.critical}</div>`;
-            } else {
-                const riskClass = p.risk === 'high' ? 'risk-high' : p.risk === 'medium' ? 'risk-medium' : 'risk-low';
-                const riskText = p.risk === 'high' ? 'HIGH RISK' : p.risk === 'medium' ? 'MEDIUM RISK' : 'LOW RISK';
-                riskHTML = `<div class="risk-indicator ${riskClass}">${riskText}</div>`;
-            }
-
-            const html = `
-                <div class="modal-header">
-                    <div class="permit-number">${permitId}</div>
-                    <h2>${p.name}</h2>
-                </div>
-                <div class="modal-section">
-                    <div class="authority-info">
-                        <div class="info-row"><span class="info-label">Authority:</span> <span class="info-value">${p.authority}</span></div>
-                        <div class="info-row"><span class="info-label">Lead Time:</span> <span class="info-value">${p.leadTime}</span></div>
-                        <div class="info-row"><span class="info-label">Cost:</span> <span class="info-value">${p.cost}</span></div>
-                    </div>
-                </div>
-                <div class="modal-section">
-                    <h3>Description</h3>
-                    <p style="color: #555; line-height: 1.6;">${p.desc}</p>
-                    ${riskHTML}
-                </div>
-                <div class="modal-section">
-                    <h3>Key Documents Required</h3>
-                    <ul class="documents-list">${p.docs.map(d => `<li>${d}</li>`).join('')}</ul>
-                </div>
-                <a href="${p.form}" target="_blank" class="form-link">Open Official Portal</a>
-            `;
-            document.getElementById('modalBody').innerHTML = html;
-            document.getElementById('permitModal').classList.add('active');
-        }
-
-        function closePermitModal() {
-            document.getElementById('permitModal').classList.remove('active');
-        }
-
-        // Tab switching
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const tabId = this.dataset.tab;
-                document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-                document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-                document.getElementById(tabId).classList.add('active');
-                this.classList.add('active');
-            });
-        });
-
-        // Close modal on outside click
-        window.onclick = function(e) {
-            const modal = document.getElementById('permitModal');
-            if (e.target === modal) modal.classList.remove('active');
-        }
-    </script>
+function refresh(){ syncChips(); updKPI(); updTable(); destroyCharts(); makeCharts(); }
+buildChips(); refresh();
+</script>
 </body>
 </html>
