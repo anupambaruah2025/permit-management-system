@@ -1,64 +1,74 @@
 /// All 23 permits for the CHN1A data-center project, with phase, lead time, cost, risk and status.
 table Permits
-	lineageTag: 5bbeac43-e9fa-4583-9f16-9f7d254416ad
+	lineageTag: 62f320bf-97cd-4c7b-80a6-69ffdc4addce
 
 	/// Total number of permits in the current filter context.
 	measure 'Permit Count' = COUNTROWS ( Permits )
 		formatString: #,##0
-		lineageTag: 98934cf4-a242-403f-bc46-0c6b65c180ef
+		lineageTag: 3c3e2c3f-5c17-4d47-9a6b-54d50ae6ef3c
 
 	/// Permits with status Completed.
 	measure Completed = CALCULATE ( [Permit Count], Permits[Status] = "Completed" )
 		formatString: #,##0
-		lineageTag: 0df873e9-4dd9-4d14-ad3e-daa8f82e87ae
+		lineageTag: e67ff156-0653-4fbb-978e-f46d3194a34f
 
 	/// Permits currently In Progress.
 	measure 'In Progress' = CALCULATE ( [Permit Count], Permits[Status] = "In Progress" )
 		formatString: #,##0
-		lineageTag: bd266aed-5cdd-48b8-a2fc-1bd9edb16e5f
+		lineageTag: d6403d9e-c8e4-422b-91c8-452142303783
 
 	/// Permits not yet started.
 	measure Pending = CALCULATE ( [Permit Count], Permits[Status] = "Pending" )
 		formatString: #,##0
-		lineageTag: 65ed9911-f58f-4948-8f78-ad4c27826442
+		lineageTag: 85750228-a545-4a5c-b7c3-2b49afe9fee8
 
 	/// Sum of lead-time days across permits.
 	measure 'Total Lead Days' = SUM ( Permits[LeadDays] )
 		formatString: #,##0
-		lineageTag: 1bf38748-718f-497d-945c-0b1fd84a9b71
+		lineageTag: cd6de874-0012-45ee-bc0d-bf0abc590de6
 
 	/// Sum of estimated permit cost (THB).
 	measure 'Total Budget' = SUM ( Permits[Cost] )
 		formatString: #,##0
-		lineageTag: 5f17e04e-2b20-4eef-a74c-776d9d2eb5a5
+		lineageTag: a2b0b9c2-eb06-4aea-af34-4e3458cd692b
 
 	/// Share of permits completed.
 	measure '% Complete' = DIVIDE ( [Completed], [Permit Count] )
 		formatString: 0%
-		lineageTag: d3ca170c-50c0-4f7e-b7f8-84387beb5d36
+		lineageTag: 35a8a7fb-4058-400f-9688-4a27dfcf2bba
+
+	/// Gantt offset: project month each permit starts (transparent segment).
+	measure 'Start (month)' = SUM ( Permits[StartMonth] )
+		formatString: 0.0
+		lineageTag: 042b194d-99ff-48f6-bf22-be5825b4d92a
+
+	/// Gantt bar length in months.
+	measure 'Duration (months)' = SUM ( Permits[DurationMonths] )
+		formatString: 0.0
+		lineageTag: 29bf8c5a-71a1-4ff8-99bb-d7b855837d8c
 
 	column ID
 		dataType: int64
 		isKey
-		lineageTag: 88724255-bbfe-4800-a2c0-184bfd033cec
+		lineageTag: d76fd3b1-a5fe-455b-8e33-f9a344c21e66
 		summarizeBy: none
 		sourceColumn: ID
 
 	column Permit
 		dataType: string
-		lineageTag: 60cb62ce-1e79-4918-8e61-784f8f136799
+		lineageTag: d20bc97d-cae3-486d-893c-fc46e88a81d0
 		summarizeBy: none
 		sourceColumn: Permit
 
 	column Authority
 		dataType: string
-		lineageTag: 96f6622f-02a0-43eb-86df-3e6c5a36ce2d
+		lineageTag: 322b0b31-77a1-4d40-9198-d9e085812867
 		summarizeBy: none
 		sourceColumn: Authority
 
 	column Phase
 		dataType: string
-		lineageTag: 346c4683-1228-4926-bce0-6f3eb29dba5f
+		lineageTag: 1f3717b3-8d9a-4b4a-87fd-f251aa561977
 		summarizeBy: none
 		sourceColumn: Phase
 		sortByColumn: PhaseNo
@@ -66,45 +76,45 @@ table Permits
 	column PhaseNo
 		dataType: int64
 		isHidden
-		lineageTag: 5d62ba64-ca28-4fad-89c4-ae9e78c8d47a
+		lineageTag: 5a4465f2-0517-4058-8a9a-c2b14e5d8bfb
 		summarizeBy: none
 		sourceColumn: PhaseNo
 
 	column LeadDays
 		dataType: int64
-		lineageTag: e23c1344-adde-41e4-b581-41493b9ecd91
+		lineageTag: de64054a-4bf9-4bab-bad8-cf58089027ff
 		summarizeBy: sum
 		sourceColumn: LeadDays
 
 	column Cost
 		dataType: int64
 		formatString: #,##0
-		lineageTag: 4f097596-c43e-450c-b192-67ff4deaf63f
+		lineageTag: fef53e60-27b3-417c-aa0f-7f84bd50a93c
 		summarizeBy: sum
 		sourceColumn: Cost
 
 	column Risk
 		dataType: string
-		lineageTag: 72602f8b-3928-4f11-9422-dfcefa362836
+		lineageTag: bfe498ea-b53d-49fc-bcb9-992fda0cf95c
 		summarizeBy: none
 		sourceColumn: Risk
 
 	column Status
 		dataType: string
-		lineageTag: 1e5c16fb-f18d-4b27-b7c8-e30c56a7bd18
+		lineageTag: 58a179dc-e278-4427-b1ee-e6978ba6e3e0
 		summarizeBy: none
 		sourceColumn: Status
 
 	column StartMonth
 		dataType: double
 		isHidden
-		lineageTag: 3024c866-2b6a-44cd-b2f5-41267fcfc636
+		lineageTag: d8d3106a-60df-4e47-9402-9edf8e842639
 		summarizeBy: none
 		sourceColumn: StartMonth
 
 	column DurationMonths
 		dataType: double
-		lineageTag: 8c66e884-1964-4d11-9179-ac0362b9d3ce
+		lineageTag: 3d6adf1a-2958-4468-9728-fd56bfed6e45
 		summarizeBy: sum
 		sourceColumn: DurationMonths
 

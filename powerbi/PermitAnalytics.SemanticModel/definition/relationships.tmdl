@@ -1,0 +1,3 @@
+relationship 8f4b934b-99d9-4807-a5da-c139bee0b72c
+	fromColumn: Permits.Authority
+	toColumn: Authorities.Authority

@@ -1,0 +1,134 @@
+{
+  "name": "authority-contacts-tableEx-0cbc16",
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "queryRef": "Authorities.Authority",
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Authorities"
+                    }
+                  },
+                  "Property": "Authority"
+                }
+              },
+              "nativeQueryRef": "Authority"
+            },
+            {
+              "queryRef": "Authorities.Phone",
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Authorities"
+                    }
+                  },
+                  "Property": "Phone"
+                }
+              },
+              "nativeQueryRef": "Phone"
+            },
+            {
+              "queryRef": "Authorities.Website",
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Authorities"
+                    }
+                  },
+                  "Property": "Website"
+                }
+              },
+              "nativeQueryRef": "Website"
+            },
+            {
+              "queryRef": "Permits.Permit Count",
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Permits"
+                    }
+                  },
+                  "Property": "Permit Count"
+                }
+              },
+              "nativeQueryRef": "Permit Count"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "Permits"
+                  }
+                },
+                "Property": "Permit Count"
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "objects": {},
+    "drillFilterOtherVisuals": true,
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Authority contacts'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "position": {
+    "x": 604,
+    "y": 476,
+    "z": 0,
+    "width": 652,
+    "height": 224,
+    "tabOrder": 0
+  },
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.9.0/schema.json"
+}

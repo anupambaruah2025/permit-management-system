@@ -47,6 +47,57 @@ for r in P:
                 % (i, esc(name), esc(auth), esc(ph), phn, days, cost, risk, status, float(gs), float(gd)))
 rows_dax = ",\n".join(rows)
 
+# ---- Authorities (one row per distinct authority, with contacts) ----
+CONTACTS = {
+ "DBD":("0-2141-4271-9","www.dbd.go.th"), "BOI":("+66-2-553-8214","www.boi.go.th"),
+ "DPW":("0-2243-9200","www.dlt.go.th"), "ONEP":("0-2298-3600","www.onep.go.th"),
+ "PEA/MEA":("0-2399-9999","www.pea.co.th"), "ERC":("via PEA/MEA","www.erc.or.th"),
+ "MWA/PWA":("0-2299-3000","www.mwa.co.th"), "MWA":("0-2299-3000","www.mwa.co.th"),
+ "DOEB":("0-2202-8300-4","www.doeb.go.th"), "NBTC":("0-2279-7800","www.nbtc.go.th"),
+ "Fire Authority":("199 / local","www.dlt.go.th"), "Utilities":("PEA/MEA/MWA","-"),
+ "DIW":("0-2201-3000","www.diw.go.th"), "PDPC":("0-2141-9000","www.pdpa.go.th"),
+ "NCSA":("0-2578-2000","www.ncsa.go.th"),
+}
+auth_order = []
+for r in P:
+    if r[2] not in auth_order: auth_order.append(r[2])
+auth_rows = []
+for a in auth_order:
+    ph_, web = CONTACTS.get(a, ("-","-"))
+    auth_rows.append('\t\t\t\t\t{ "%s", "%s", "%s" }' % (esc(a), esc(ph_), esc(web)))
+auth_dax = ",\n".join(auth_rows)
+
+# ---- Dependencies (Blocker -> Blocked edges) ----
+DEP = [
+ ("Company Registration","BOI Promotion Certificate"),
+ ("Company Registration","Foreign Business License"),
+ ("Land Use & Zoning","Environmental Impact Assessment"),
+ ("Power Availability (ERC)","BOI Promotion Certificate"),
+ ("Power Availability (ERC)","Grid Connection Approval"),
+ ("Environmental Impact Assessment","Building Construction Permit"),
+ ("Environmental Impact Assessment","Water Supply Connection"),
+ ("Environmental Impact Assessment","Wastewater / Drainage"),
+ ("Environmental Impact Assessment","Generator & Fuel Storage"),
+ ("Environmental Impact Assessment","Factory License"),
+ ("Building Construction Permit","Road Access / Highway"),
+ ("Building Construction Permit","Water Supply Connection"),
+ ("Building Construction Permit","Wastewater / Drainage"),
+ ("Building Construction Permit","Fire Protection System"),
+ ("Building Construction Permit","Generator & Fuel Storage"),
+ ("Building Construction Permit","Telecom / Fiber"),
+ ("Building Construction Permit","Building Completion"),
+ ("Grid Connection Approval","HV Substation Approval"),
+ ("Grid Connection Approval","Electrical Inspection"),
+ ("Fire Protection System","Fire Safety Inspection"),
+ ("Building Completion","Occupancy Certificate"),
+ ("Fire Safety Inspection","Occupancy Certificate"),
+ ("Electrical Inspection","Occupancy Certificate"),
+ ("Occupancy Certificate","Commissioning & Utility Acceptance"),
+ ("Occupancy Certificate","Factory License"),
+]
+dep_rows = ['\t\t\t\t\t{ "%s", "%s" }' % (esc(b), esc(t)) for b,t in DEP]
+dep_dax = ",\n".join(dep_rows)
+
 g = lambda: str(uuid.uuid4())
 
 permits_tmdl = f"""/// All 23 permits for the CHN1A data-center project, with phase, lead time, cost, risk and status.
@@ -86,6 +137,16 @@ table Permits
 \t/// Share of permits completed.
 \tmeasure '% Complete' = DIVIDE ( [Completed], [Permit Count] )
 \t\tformatString: 0%
+\t\tlineageTag: {g()}
+
+\t/// Gantt offset: project month each permit starts (transparent segment).
+\tmeasure 'Start (month)' = SUM ( Permits[StartMonth] )
+\t\tformatString: 0.0
+\t\tlineageTag: {g()}
+
+\t/// Gantt bar length in months.
+\tmeasure 'Duration (months)' = SUM ( Permits[DurationMonths] )
+\t\tformatString: 0.0
 \t\tlineageTag: {g()}
 
 \tcolumn ID
@@ -182,6 +243,81 @@ table Permits
 \tannotation PBI_ResultType = Table
 """
 
+authorities_tmdl = f"""/// One row per government authority, with contact details.
+table Authorities
+\tlineageTag: {g()}
+
+\tcolumn Authority
+\t\tdataType: string
+\t\tisKey
+\t\tlineageTag: {g()}
+\t\tsummarizeBy: none
+\t\tsourceColumn: Authority
+
+\tcolumn Phone
+\t\tdataType: string
+\t\tlineageTag: {g()}
+\t\tsummarizeBy: none
+\t\tsourceColumn: Phone
+
+\tcolumn Website
+\t\tdataType: string
+\t\tdataCategory: WebUrl
+\t\tlineageTag: {g()}
+\t\tsummarizeBy: none
+\t\tsourceColumn: Website
+
+\tpartition Authorities = calculated
+\t\tmode: import
+\t\tsource =
+\t\t\t\tDATATABLE (
+\t\t\t\t\t"Authority", STRING,
+\t\t\t\t\t"Phone", STRING,
+\t\t\t\t\t"Website", STRING,
+\t\t\t\t\t{{
+{auth_dax}
+\t\t\t\t\t}}
+\t\t\t\t)
+"""
+
+dependencies_tmdl = f"""/// Blocker -> Blocked permit dependency edges (which permit must finish before another can start).
+table Dependencies
+\tlineageTag: {g()}
+
+\t/// Number of dependency links in context.
+\tmeasure 'Dependency Count' = COUNTROWS ( Dependencies )
+\t\tformatString: #,##0
+\t\tlineageTag: {g()}
+
+\tcolumn Blocker
+\t\tdataType: string
+\t\tlineageTag: {g()}
+\t\tsummarizeBy: none
+\t\tsourceColumn: Blocker
+
+\tcolumn Blocked
+\t\tdataType: string
+\t\tlineageTag: {g()}
+\t\tsummarizeBy: none
+\t\tsourceColumn: Blocked
+
+\tpartition Dependencies = calculated
+\t\tmode: import
+\t\tsource =
+\t\t\t\tDATATABLE (
+\t\t\t\t\t"Blocker", STRING,
+\t\t\t\t\t"Blocked", STRING,
+\t\t\t\t\t{{
+{dep_dax}
+\t\t\t\t\t}}
+\t\t\t\t)
+"""
+
+relationships_tmdl = f"""relationship {g()}
+\tfromColumn: Permits.Authority
+\ttoColumn: Authorities.Authority
+"""
+
 model_tmdl = """model PermitAnalytics
 \tculture: en-US
 \tdefaultPowerBIDataSourceVersion: powerBI_V3
@@ -191,7 +327,7 @@ model_tmdl = """model PermitAnalytics
 \t\tlegacyRedirects
 \t\treturnErrorValuesAsNull
 
-\tannotation PBI_QueryOrder = ["Permits"]
+\tannotation PBI_QueryOrder = ["Permits","Authorities","Dependencies"]
 
 \tannotation __PBI_TimeIntelligenceEnabled = 0
 """
@@ -213,6 +349,9 @@ platform = json.dumps({
 }, indent=2)
 
 w(os.path.join(TBL,"Permits.tmdl"), permits_tmdl)
+w(os.path.join(TBL,"Authorities.tmdl"), authorities_tmdl)
+w(os.path.join(TBL,"Dependencies.tmdl"), dependencies_tmdl)
+w(os.path.join(DEF,"relationships.tmdl"), relationships_tmdl)
 w(os.path.join(DEF,"model.tmdl"), model_tmdl)
 w(os.path.join(DEF,"database.tmdl"), database_tmdl)
 w(os.path.join(SM,"definition.pbism"), pbism)

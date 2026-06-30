@@ -23,18 +23,25 @@ The model is **self-contained** — the 23 permits are embedded as a DAX calcula
 2. Double-click **`PermitAnalytics.pbip`** (or File → Open in Power BI Desktop).
 3. The model loads with all data; the report opens on the **Overview** page.
 
-## What you get (native Power BI interactivity)
+## Three views — click a heading to switch
 
-- **KPI cards:** Permits, Completed, In Progress, Budget (THB)
-- **Donut:** status mix · **Column:** permits by phase · **Bar:** budget by phase
-- **Slicers:** Phase, Status, Risk
-- **Table:** full permit register (ID, Permit, Authority, Phase, Lead Days, Cost, Risk, Status)
+Every page has a **Page Navigator** strip at the top (Timeline · Dependencies · Authority).
+Click a heading and Power BI jumps to that view. Within a view, click any bar, row, or
+slicer and the other visuals cross-filter.
 
-Click any slicer, donut slice, or bar and **every visual cross-filters** — the real Power BI behaviour. Edit visuals, add pages, or publish to the Power BI service / Fabric from Desktop.
+- **Timeline** — Gantt schedule (each permit's start month → finish, sorted by start) + a
+  detail table (permit, phase, lead days, start month, duration).
+- **Dependencies** — Blocker → Blocked table, a "most-blocking permits" bar, and a Blocker
+  slicer. Shows which permits gate others (EIA and the Building Permit block the most).
+- **Authority** — permits grouped by authority (matrix), a "permits per authority" bar, and
+  a contacts table (authority, phone, website).
 
-## Measures (DAX)
+## Model (DAX measures + tables)
 
-`Permit Count`, `Completed`, `In Progress`, `Pending`, `Total Lead Days`, `Total Budget`, `% Complete` — defined in `PermitAnalytics.SemanticModel/definition/tables/Permits.tmdl`.
+Tables: **Permits** (23 rows), **Authorities** (contacts, related to Permits), **Dependencies**
+(Blocker→Blocked edges). Measures: `Permit Count`, `Total Lead Days`, `Total Budget`,
+`Start (month)`, `Duration (months)`, `Dependency Count` — in
+`PermitAnalytics.SemanticModel/definition/tables/`.
 
 ## Regenerate the model
 

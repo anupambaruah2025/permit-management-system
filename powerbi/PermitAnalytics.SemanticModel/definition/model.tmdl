@@ -7,6 +7,6 @@ model PermitAnalytics
 		legacyRedirects
 		returnErrorValuesAsNull
 
-	annotation PBI_QueryOrder = ["Permits"]
+	annotation PBI_QueryOrder = ["Permits","Authorities","Dependencies"]
 
 	annotation __PBI_TimeIntelligenceEnabled = 0

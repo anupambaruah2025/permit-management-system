@@ -1,0 +1,49 @@
+/// One row per government authority, with contact details.
+table Authorities
+	lineageTag: 49518ce5-5239-4078-8147-2fba16d9209f
+
+	column Authority
+		dataType: string
+		isKey
+		lineageTag: 978181ea-9349-45e6-8d7f-df94583630b8
+		summarizeBy: none
+		sourceColumn: Authority
+
+	column Phone
+		dataType: string
+		lineageTag: d8c28166-9660-4011-b900-6f599b022d36
+		summarizeBy: none
+		sourceColumn: Phone
+
+	column Website
+		dataType: string
+		dataCategory: WebUrl
+		lineageTag: ff291af1-ae3d-412b-8b96-cd65fa52e9af
+		summarizeBy: none
+		sourceColumn: Website
+
+	partition Authorities = calculated
+		mode: import
+		source =
+				DATATABLE (
+					"Authority", STRING,
+					"Phone", STRING,
+					"Website", STRING,
+					{
+					{ "DBD", "0-2141-4271-9", "www.dbd.go.th" },
+					{ "BOI", "+66-2-553-8214", "www.boi.go.th" },
+					{ "DPW", "0-2243-9200", "www.dlt.go.th" },
+					{ "ONEP", "0-2298-3600", "www.onep.go.th" },
+					{ "PEA/MEA", "0-2399-9999", "www.pea.co.th" },
+					{ "ERC", "via PEA/MEA", "www.erc.or.th" },
+					{ "MWA/PWA", "0-2299-3000", "www.mwa.co.th" },
+					{ "MWA", "0-2299-3000", "www.mwa.co.th" },
+					{ "DOEB", "0-2202-8300-4", "www.doeb.go.th" },
+					{ "NBTC", "0-2279-7800", "www.nbtc.go.th" },
+					{ "Fire Authority", "199 / local", "www.dlt.go.th" },
+					{ "Utilities", "PEA/MEA/MWA", "-" },
+					{ "DIW", "0-2201-3000", "www.diw.go.th" },
+					{ "PDPC", "0-2141-9000", "www.pdpa.go.th" },
+					{ "NCSA", "0-2578-2000", "www.ncsa.go.th" }
+					}
+				)

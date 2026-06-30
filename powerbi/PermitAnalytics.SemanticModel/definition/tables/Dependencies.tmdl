@@ -1,0 +1,55 @@
+/// Blocker -> Blocked permit dependency edges (which permit must finish before another can start).
+table Dependencies
+	lineageTag: 87ee1b8e-b81c-4634-a154-f9316761f19b
+
+	/// Number of dependency links in context.
+	measure 'Dependency Count' = COUNTROWS ( Dependencies )
+		formatString: #,##0
+		lineageTag: d2b9a5a7-bcfd-43d4-846e-5f76659d291a
+
+	column Blocker
+		dataType: string
+		lineageTag: 79098480-e2b3-4d89-8551-e2dfcda05fb7
+		summarizeBy: none
+		sourceColumn: Blocker
+
+	column Blocked
+		dataType: string
+		lineageTag: 3f45b146-a4bd-42f2-86f5-92d8de7a9821
+		summarizeBy: none
+		sourceColumn: Blocked
+
+	partition Dependencies = calculated
+		mode: import
+		source =
+				DATATABLE (
+					"Blocker", STRING,
+					"Blocked", STRING,
+					{
+					{ "Company Registration", "BOI Promotion Certificate" },
+					{ "Company Registration", "Foreign Business License" },
+					{ "Land Use & Zoning", "Environmental Impact Assessment" },
+					{ "Power Availability (ERC)", "BOI Promotion Certificate" },
+					{ "Power Availability (ERC)", "Grid Connection Approval" },
+					{ "Environmental Impact Assessment", "Building Construction Permit" },
+					{ "Environmental Impact Assessment", "Water Supply Connection" },
+					{ "Environmental Impact Assessment", "Wastewater / Drainage" },
+					{ "Environmental Impact Assessment", "Generator & Fuel Storage" },
+					{ "Environmental Impact Assessment", "Factory License" },
+					{ "Building Construction Permit", "Road Access / Highway" },
+					{ "Building Construction Permit", "Water Supply Connection" },
+					{ "Building Construction Permit", "Wastewater / Drainage" },
+					{ "Building Construction Permit", "Fire Protection System" },
+					{ "Building Construction Permit", "Generator & Fuel Storage" },
+					{ "Building Construction Permit", "Telecom / Fiber" },
+					{ "Building Construction Permit", "Building Completion" },
+					{ "Grid Connection Approval", "HV Substation Approval" },
+					{ "Grid Connection Approval", "Electrical Inspection" },
+					{ "Fire Protection System", "Fire Safety Inspection" },
+					{ "Building Completion", "Occupancy Certificate" },
+					{ "Fire Safety Inspection", "Occupancy Certificate" },
+					{ "Electrical Inspection", "Occupancy Certificate" },
+					{ "Occupancy Certificate", "Commissioning & Utility Acceptance" },
+					{ "Occupancy Certificate", "Factory License" }
+					}
+				)
