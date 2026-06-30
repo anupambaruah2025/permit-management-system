@@ -1,0 +1,172 @@
+{
+  "name": "permit-register-tableEx-6915b5",
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "queryRef": "Permits.ID",
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Permits"
+                    }
+                  },
+                  "Property": "ID"
+                }
+              },
+              "nativeQueryRef": "ID"
+            },
+            {
+              "queryRef": "Permits.Permit",
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Permits"
+                    }
+                  },
+                  "Property": "Permit"
+                }
+              },
+              "nativeQueryRef": "Permit"
+            },
+            {
+              "queryRef": "Permits.Authority",
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Permits"
+                    }
+                  },
+                  "Property": "Authority"
+                }
+              },
+              "nativeQueryRef": "Authority"
+            },
+            {
+              "queryRef": "Permits.Phase",
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Permits"
+                    }
+                  },
+                  "Property": "Phase"
+                }
+              },
+              "nativeQueryRef": "Phase"
+            },
+            {
+              "queryRef": "Permits.LeadDays",
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Permits"
+                    }
+                  },
+                  "Property": "LeadDays"
+                }
+              },
+              "nativeQueryRef": "LeadDays"
+            },
+            {
+              "queryRef": "Permits.Cost",
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Permits"
+                    }
+                  },
+                  "Property": "Cost"
+                }
+              },
+              "nativeQueryRef": "Cost"
+            },
+            {
+              "queryRef": "Permits.Risk",
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Permits"
+                    }
+                  },
+                  "Property": "Risk"
+                }
+              },
+              "nativeQueryRef": "Risk"
+            },
+            {
+              "queryRef": "Permits.Status",
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Permits"
+                    }
+                  },
+                  "Property": "Status"
+                }
+              },
+              "nativeQueryRef": "Status"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {},
+    "drillFilterOtherVisuals": true,
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Permit register'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "position": {
+    "x": 24,
+    "y": 490,
+    "z": 0,
+    "width": 770,
+    "height": 210,
+    "tabOrder": 0
+  },
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.9.0/schema.json"
+}

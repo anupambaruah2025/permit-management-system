@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "PermitAnalytics"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "57b1e5e1-a3be-4773-a02f-a676013b48d0"
+  }
+}

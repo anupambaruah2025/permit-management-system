@@ -1,0 +1,153 @@
+/// All 23 permits for the CHN1A data-center project, with phase, lead time, cost, risk and status.
+table Permits
+	lineageTag: 5bbeac43-e9fa-4583-9f16-9f7d254416ad
+
+	/// Total number of permits in the current filter context.
+	measure 'Permit Count' = COUNTROWS ( Permits )
+		formatString: #,##0
+		lineageTag: 98934cf4-a242-403f-bc46-0c6b65c180ef
+
+	/// Permits with status Completed.
+	measure Completed = CALCULATE ( [Permit Count], Permits[Status] = "Completed" )
+		formatString: #,##0
+		lineageTag: 0df873e9-4dd9-4d14-ad3e-daa8f82e87ae
+
+	/// Permits currently In Progress.
+	measure 'In Progress' = CALCULATE ( [Permit Count], Permits[Status] = "In Progress" )
+		formatString: #,##0
+		lineageTag: bd266aed-5cdd-48b8-a2fc-1bd9edb16e5f
+
+	/// Permits not yet started.
+	measure Pending = CALCULATE ( [Permit Count], Permits[Status] = "Pending" )
+		formatString: #,##0
+		lineageTag: 65ed9911-f58f-4948-8f78-ad4c27826442
+
+	/// Sum of lead-time days across permits.
+	measure 'Total Lead Days' = SUM ( Permits[LeadDays] )
+		formatString: #,##0
+		lineageTag: 1bf38748-718f-497d-945c-0b1fd84a9b71
+
+	/// Sum of estimated permit cost (THB).
+	measure 'Total Budget' = SUM ( Permits[Cost] )
+		formatString: #,##0
+		lineageTag: 5f17e04e-2b20-4eef-a74c-776d9d2eb5a5
+
+	/// Share of permits completed.
+	measure '% Complete' = DIVIDE ( [Completed], [Permit Count] )
+		formatString: 0%
+		lineageTag: d3ca170c-50c0-4f7e-b7f8-84387beb5d36
+
+	column ID
+		dataType: int64
+		isKey
+		lineageTag: 88724255-bbfe-4800-a2c0-184bfd033cec
+		summarizeBy: none
+		sourceColumn: ID
+
+	column Permit
+		dataType: string
+		lineageTag: 60cb62ce-1e79-4918-8e61-784f8f136799
+		summarizeBy: none
+		sourceColumn: Permit
+
+	column Authority
+		dataType: string
+		lineageTag: 96f6622f-02a0-43eb-86df-3e6c5a36ce2d
+		summarizeBy: none
+		sourceColumn: Authority
+
+	column Phase
+		dataType: string
+		lineageTag: 346c4683-1228-4926-bce0-6f3eb29dba5f
+		summarizeBy: none
+		sourceColumn: Phase
+		sortByColumn: PhaseNo
+
+	column PhaseNo
+		dataType: int64
+		isHidden
+		lineageTag: 5d62ba64-ca28-4fad-89c4-ae9e78c8d47a
+		summarizeBy: none
+		sourceColumn: PhaseNo
+
+	column LeadDays
+		dataType: int64
+		lineageTag: e23c1344-adde-41e4-b581-41493b9ecd91
+		summarizeBy: sum
+		sourceColumn: LeadDays
+
+	column Cost
+		dataType: int64
+		formatString: #,##0
+		lineageTag: 4f097596-c43e-450c-b192-67ff4deaf63f
+		summarizeBy: sum
+		sourceColumn: Cost
+
+	column Risk
+		dataType: string
+		lineageTag: 72602f8b-3928-4f11-9422-dfcefa362836
+		summarizeBy: none
+		sourceColumn: Risk
+
+	column Status
+		dataType: string
+		lineageTag: 1e5c16fb-f18d-4b27-b7c8-e30c56a7bd18
+		summarizeBy: none
+		sourceColumn: Status
+
+	column StartMonth
+		dataType: double
+		isHidden
+		lineageTag: 3024c866-2b6a-44cd-b2f5-41267fcfc636
+		summarizeBy: none
+		sourceColumn: StartMonth
+
+	column DurationMonths
+		dataType: double
+		lineageTag: 8c66e884-1964-4d11-9179-ac0362b9d3ce
+		summarizeBy: sum
+		sourceColumn: DurationMonths
+
+	partition Permits = calculated
+		mode: import
+		source =
+				DATATABLE (
+					"ID", INTEGER,
+					"Permit", STRING,
+					"Authority", STRING,
+					"Phase", STRING,
+					"PhaseNo", INTEGER,
+					"LeadDays", INTEGER,
+					"Cost", INTEGER,
+					"Risk", STRING,
+					"Status", STRING,
+					"StartMonth", DOUBLE,
+					"DurationMonths", DOUBLE,
+					{
+					{ 1, "Company Registration", "DBD", "1. Development", 1, 30, 5000, "Low", "Completed", 0.0, 1.0 },
+					{ 2, "BOI Promotion Certificate", "BOI", "1. Development", 1, 120, 0, "Critical", "Completed", 0.5, 4.0 },
+					{ 3, "Foreign Business License", "DBD", "1. Development", 1, 60, 10000, "Low", "Completed", 0.5, 2.0 },
+					{ 4, "Land Use & Zoning", "DPW", "1. Development", 1, 30, 2000, "Low", "Completed", 0.0, 1.0 },
+					{ 5, "Environmental Impact Assessment", "ONEP", "1. Development", 1, 180, 350000, "Critical", "Completed", 0.5, 6.0 },
+					{ 6, "Building Construction Permit", "DPW", "2. Design & Planning", 2, 60, 15000, "Critical", "Completed", 6.0, 2.0 },
+					{ 7, "Road Access / Highway", "DPW", "2. Design & Planning", 2, 45, 8000, "High", "In Progress", 6.0, 1.5 },
+					{ 8, "Grid Connection Approval", "PEA/MEA", "2. Design & Planning", 2, 60, 75000, "High", "Completed", 2.0, 2.0 },
+					{ 9, "Power Availability (ERC)", "ERC", "2. Design & Planning", 2, 30, 0, "Critical", "Completed", 0.5, 1.0 },
+					{ 10, "HV Substation Approval", "PEA/MEA", "2. Design & Planning", 2, 90, 150000, "High", "Completed", 6.0, 3.0 },
+					{ 11, "Water Supply Connection", "MWA/PWA", "3. Construction", 3, 45, 30000, "Low", "Completed", 8.0, 1.5 },
+					{ 12, "Wastewater / Drainage", "MWA", "3. Construction", 3, 45, 37500, "Low", "Completed", 8.0, 1.5 },
+					{ 13, "Fire Protection System", "DPW", "3. Construction", 3, 30, 115000, "High", "Completed", 8.0, 1.0 },
+					{ 14, "Generator & Fuel Storage", "DOEB", "3. Construction", 3, 60, 15000, "High", "In Progress", 8.0, 2.0 },
+					{ 15, "Telecom / Fiber", "NBTC", "3. Construction", 3, 45, 10000, "Low", "In Progress", 8.0, 1.5 },
+					{ 16, "Electrical Inspection", "PEA/MEA", "3. Construction", 3, 14, 5000, "Low", "In Progress", 10.0, 0.5 },
+					{ 17, "Fire Safety Inspection", "Fire Authority", "4. Commissioning", 4, 7, 0, "Low", "In Progress", 11.0, 0.4 },
+					{ 18, "Building Completion", "DPW", "4. Commissioning", 4, 7, 3000, "Low", "In Progress", 11.0, 0.4 },
+					{ 19, "Occupancy Certificate", "DPW", "4. Commissioning", 4, 14, 2000, "High", "In Progress", 11.3, 0.6 },
+					{ 20, "Commissioning & Utility Acceptance", "Utilities", "4. Commissioning", 4, 21, 22500, "Low", "Pending", 11.5, 0.8 },
+					{ 21, "Factory License", "DIW", "5. Operations", 5, 30, 5000, "Low", "Pending", 12.0, 1.0 },
+					{ 22, "PDPA Compliance", "PDPC", "5. Operations", 5, 30, 0, "Low", "Pending", 12.0, 1.0 },
+					{ 23, "Cybersecurity Compliance", "NCSA", "5. Operations", 5, 30, 0, "Low", "Pending", 12.0, 1.0 }
+					}
+				)
+
+	annotation PBI_ResultType = Table

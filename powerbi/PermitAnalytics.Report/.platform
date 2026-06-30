@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Report",
+    "displayName": "PermitAnalytics"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "306b1b3a-c8f5-40c6-b57a-43d87f785e81"
+  }
+}
