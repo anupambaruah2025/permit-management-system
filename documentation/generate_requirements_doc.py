@@ -159,8 +159,9 @@ PERMITS = [
   ("When needed","Foreign ownership >49% and no BOI card covering the activity")],
  "Authorises a foreign-majority company to carry on a restricted-list business in Thailand. If BOI promotion already grants a "
  "Foreign Business Certificate for the activity, a separate FBL may not be needed — confirm overlap before filing both.",
- [("Application form P.13","The FBL application describing the foreign business activity, capacity and how it benefits Thailand "
-   "(technology transfer, jobs, local spend). The 'benefit to Thailand' narrative is decisive for the committee."),
+ [("Application form Tor. 2 (ต.2)","The statutory FBL application under the Foreign Business Act B.E. 2542, lodged with the Bureau "
+   "of Foreign Business Administration, DBD. It describes the foreign business activity, size, intended operating period, number of "
+   "employees in Thailand and the expected benefit to Thailand's economy — that benefit narrative is decisive for the committee."),
   ("Business plan in Thai (5–10 pp)","A detailed plan: services, operations, customers, revenue and management. Must be in Thai and "
    "specific — a generic plan is the most common rejection reason."),
   ("Minimum capital evidence","Proof of at least 2,000,000 THB (3M+ if the activity is on List 2/3) actually remitted and held for "
@@ -531,9 +532,105 @@ for x in [
     p = doc.add_paragraph(style='List Bullet'); p.add_run(x)
 
 doc.add_paragraph()
+
+# ============================ FORMS & ANNEXES ============================
+doc.add_page_break()
+H("Forms & annexes — verified detail for the key permits", 1)
+para("The form codes and statutory contents below were checked against official/government sources (BOI Investment "
+     "Promotion Guide 2025, the DBD Foreign Business Act application handbook, and ONEP EIA guidance). Always download the "
+     "current form from the authority's portal before lodging — codes and annex lists are updated periodically.", italic=True, color=GREY, size=9)
+doc.add_paragraph()
+
+def subform(title, facts_lines, annex_title, annexes, note=None):
+    H(title, 2)
+    for k,v in facts_lines:
+        p = doc.add_paragraph(); r=p.add_run(k+": "); r.bold=True; p.add_run(v); p.paragraph_format.space_after=Pt(2)
+    para(annex_title, bold=True, color=DARK, space_after=2)
+    for a in annexes:
+        pp = doc.add_paragraph(style='List Bullet'); pp.add_run(a); pp.paragraph_format.space_after=Pt(2)
+    if note: para(note, italic=True, color=GREY, size=9)
+    doc.add_paragraph()
+
+subform("Company Registration — forms",
+ [("Authority","Department of Business Development (DBD), via DBD e-Registration"),
+  ("Core forms","Memorandum of Association (MOA) registration; statutory-meeting minutes; company-registration application "
+   "(Bor.Or.Jor. set); shareholder list Bor.Or.Jor.5"),
+  ("Tax","VAT/Tax-ID registration via the Revenue Department (Phor.Phor.01 / Phor.Phor.20) once registered")],
+ "Filed together as the incorporation packet:",
+ ["MOA — objectives (must include data-centre/IT-infrastructure operation), registered capital and shares",
+  "List of promoters/shareholders with nationalities and shareholding (Bor.Or.Jor.5)",
+  "Directors' details and authorised-signatory/seal arrangement",
+  "Registered-office consent letter + house registration (Tabien Baan) + location map",
+  "Company affidavit (Nangsue Rabrong) is issued on registration — keep certified copies"])
+
+subform("BOI Promotion — application & annexes",
+ [("Authority","Thailand Board of Investment (BOI), via the BOI online e-Investment system"),
+  ("Activity codes","8.2.1.1 — data centre with high power-usage effectiveness (8-year CIT exemption, capped); "
+   "8.2.1.2 — other data centre (5-year CIT exemption, cap 100% of investment)"),
+  ("Hard prerequisite","ERC/MEA/PEA power-availability confirmation before the application is accepted")],
+ "Annexes submitted with the online application (certified Thai translations, PDF):",
+ ["Detailed business plan and 3-year financial projections (feasibility study above ~2 bn THB investment)",
+  "Electricity and water management plans; technical pack (single-line, cooling, network)",
+  "PUE modelling / CFD studies — required to claim 8.2.1.1",
+  "Thailand Benefits Plan — training & knowledge-transfer to Thai nationals, local supply chain (must be fully implemented "
+  "BEFORE the CIT exemption can be exercised)",
+  "Shareholder list with nationalities; parent-company audited financials & incorporation cert (apostilled) for corporate investors",
+  "ISO/IEC 27001 roadmap (feeds the later tax-activation verification)"],
+ "Note: BOI now runs quarterly e-Monitoring; two consecutive missed reports can revoke the certificate.")
+
+subform("Foreign Business License — Form Tor. 2 (ต.2)",
+ [("Authority","Bureau of Foreign Business Administration, DBD (or Provincial Business Development Office)"),
+  ("Statute / fee / time","Foreign Business Act B.E. 2542; application fee 2,000 THB; statutory consideration within 60 days")],
+ "Documents accompanying Form Tor. 2:",
+ ["Identification document for the foreigner (passport/affidavit), apostilled + translated",
+  "Certification that the applicant holds the correct qualifications and has none of the prohibited characteristics under "
+  "Section 16 of the Foreign Business Act",
+  "Letter of business detail — type & size of business, intended operating period, number of employees in Thailand, and the "
+  "expected overall benefit to Thailand's economy",
+  "Map indicating the approximate location of the place of business in Thailand",
+  "Minimum-capital evidence (≥2M THB; 3M+ for List 2/3 activities) with bank certification"],
+ "Note: if the BOI card already grants a Foreign Business Certificate for the activity, a separate FBL may be unnecessary.")
+
+subform("EIA — statutory report contents (ONEP / EIEB)",
+ [("Authority","Environmental Impact Evaluation Bureau (EIEB), under ONEP"),
+  ("Phases assessed","Construction phase and operation phase (cumulative impacts included)")],
+ "By law the EIA report must at minimum contain:",
+ ["Detailed project description and land-use plan (with location map at 1:50,000 or other appropriate scale)",
+  "Current/existing environmental situation — physical, biological, human-use and quality-of-life values, classified as "
+  "capable / incapable of rehabilitation, with surrounding-area map",
+  "Analysis of alternatives that could be operated",
+  "Assessment of direct and indirect impacts — incl. air-quality and water-quality impacts vs. the area's assimilative capacity",
+  "Public participation in the assessment (consultation record)",
+  "Measures to prevent and rectify impacts, and to compensate/remedy damage — plus the monitoring programme"],
+ "Note: the report must be authored by an ONEP-licensed EIA consultant; the TOR agreed at screening fixes the exact baseline scope.")
+
+subform("Building Permit — forms",
+ [("Authority","Local Building Control Authority, under the Building Control Act B.E. 2522"),
+  ("Core forms","Construction-permit application (Form Khor.1); permit issued as Form Or.1; modification/【use change uses Khor./Or. series")],
+ "Submitted with the application:",
+ ["Architectural, structural (with calculations) and MEP drawing sets, each sealed by a Thai-licensed professional",
+  "Fire & life-safety plan; title deed + zoning confirmation",
+  "EIA approval letter attached where the project requires EIA",
+  "Engineer/architect licence copies and letters of undertaking"])
+
+subform("Factory License — forms (DIW)",
+ [("Authority","Department of Industrial Works (DIW), under the Factory Act B.E. 2535 (as amended)"),
+  ("Core forms","Factory establishment/operation licence application (Ror.Ngor. series, e.g. Ror.Ngor.3); operation start notification")],
+ "Submitted with the application:",
+ ["Machinery list with capacity and total horsepower (determines whether the Factory Act threshold is met)",
+  "Building/occupancy certificate; site plan",
+  "Environmental compliance (EIA approval or notification); waste & byproduct management plan",
+  "Worker-safety, fire-safety and occupational-health plans; factory-manager appointment; workers'-compensation insurance"],
+ "Note: confirm with DIW whether the facility's plant actually crosses the Factory Act threshold before assuming applicability.")
+
+para("Sources: BOI Investment Promotion Guide 2025 (boi.go.th); DBD Foreign Business Act application handbook "
+     "(onestopservice.ditp.go.th) and DBD (dbd.go.th); ONEP / EIA Thailand (eiathailand.onep.go.th). Form codes verified "
+     "June 2026 — re-check the authority's portal before lodging.", italic=True, color=GREY, size=9)
+
+doc.add_paragraph()
 para("Prepared from the CHN1A permitting research package (Master Permitting Guide, EIA & FBL detailed guides, "
-     "BOI updates analysis, and the 23 permit checklists). Figures are planning estimates — confirm current "
-     "requirements with each authority before lodging.", italic=True, color=GREY, size=9)
+     "BOI updates analysis, and the 23 permit checklists) plus the verified form/annex detail above. Figures are planning "
+     "estimates — confirm current requirements with each authority before lodging.", italic=True, color=GREY, size=9)
 
 out = os.path.join(os.path.dirname(os.path.abspath(__file__)), "08_PERMIT_REQUIREMENTS_EXPLAINED.docx")
 doc.save(out)
