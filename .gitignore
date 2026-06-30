@@ -1,0 +1,35 @@
+# Operating System
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+
+# Office files (temporary)
+~$*.xlsx
+~$*.docx
+*.tmp
+
+# Logs
+*.log
+
+# Node modules (if using any)
+node_modules/
+
+# Environment
+.env
+.env.local
